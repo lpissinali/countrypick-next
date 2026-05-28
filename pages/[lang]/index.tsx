@@ -1,5 +1,5 @@
+import { useEffect, useRef } from 'react';
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { getFooterContinents } from '@/lib/queries';
@@ -13,11 +13,16 @@ interface Props {
   continents: FooterContinent[];
 }
 
-const FEATURED: { img: string; alt: string; href: string; label: string; sub: string }[] = [
-  { img: 'us',     alt: 'United States Tours',  href: 'united-states-of-america', label: 'United States', sub: 'Washington'     },
-  { img: 'it',     alt: 'Italy Tours',           href: 'italy',                    label: 'Italy',         sub: 'Rome'           },
-  { img: 'england',alt: 'England Tours',         href: 'united-kingdom',           label: 'England',       sub: 'London'         },
-  { img: 'jp',     alt: 'Japan Tours',           href: 'japan',                    label: 'Japan',         sub: 'Tokyo'          },
+type FeaturedItem = { img: string; alt: string; href: string; label: string; sub: string; ribbon?: string };
+const FEATURED_ROW1_BIG:    FeaturedItem =   { img: 'us', alt: 'United States Tours',  href: 'united-states-of-america', label: 'United States', sub: 'Washington' };
+const FEATURED_ROW1_STACK:  FeaturedItem[] = [
+  { img: 'it', alt: 'Italy Tours',          href: 'italy',          label: 'Italy',   sub: 'Rome'   },
+  { img: 'gb', alt: 'United Kingdom Tours', href: 'united-kingdom', label: 'England', sub: 'London' },
+];
+const FEATURED_ROW2: FeaturedItem[] = [
+  { img: 'jp', alt: 'Japan Tours',  href: 'japan',  label: 'Japan',  sub: 'Tokyo',         ribbon: 'top_rated' },
+  { img: 'br', alt: 'Brazil Tours', href: 'brazil', label: 'Brazil', sub: 'Rio de Janeiro', ribbon: 'top_rated' },
+  { img: 'ca', alt: 'Canada Tours', href: 'canada', label: 'Canada', sub: 'Ottawa',         ribbon: 'top_rated' },
 ];
 
 const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
@@ -97,20 +102,49 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
     countriesVisitedSmall: t['mw_countries_visited_small'] ?? 'countries visited',
   };
 
+  // Guard against double-init within the same mount (React StrictMode / HMR).
+  // Using a ref (not a window global) so the flag resets when the component
+  // unmounts — allowing the map to reinitialize after a language switch.
+  const mapInitRef = useRef(false);
+
+  useEffect(() => {
+    if (mapInitRef.current) return;
+    mapInitRef.current = true;
+
+    // map-widget.js reads window.MW_I18N for i18n strings
+    (window as any).MW_I18N = mwStrings;
+
+    const loadScript = (src: string) => new Promise<void>((resolve, reject) => {
+      // For map-widget.js: always remove the old tag and re-add it so the IIFE
+      // re-executes against the freshly-rendered #mw-map container.
+      if (src === '/static/js/map-widget.js') {
+        document.querySelector(`script[src="${src}"]`)?.remove();
+      } else if (document.querySelector(`script[src="${src}"]`)) {
+        resolve(); return;
+      }
+      const s = document.createElement('script');
+      s.src = src; s.async = false;
+      s.onload = () => resolve();
+      s.onerror = reject;
+      document.body.appendChild(s);
+    });
+
+    const leafletReady    = typeof (window as any).L !== 'undefined';
+    const html2canvasReady = typeof (window as any).html2canvas !== 'undefined';
+
+    (leafletReady
+      ? Promise.resolve()
+      : loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'))
+      .then(() => html2canvasReady
+        ? Promise.resolve()
+        : loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'))
+      .then(() => loadScript('/static/js/map-widget.js'))
+      .catch(console.error);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Layout lang={lang} t={t} seo={seo} continents={continents}>
-      {/* Map widget extra CSS + deps */}
-      <Head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossOrigin="anonymous" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossOrigin="anonymous" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" />
-        <link rel="stylesheet" href="https://ik.imagekit.io/bwvxkqzwak0rq/static/css/map-widget.css" />
-        <link rel="canonical" href={canonical} />
-      </Head>
-
       {/* ── Map Widget ── */}
       <div className="map-widget-wrap">
         <div className="mw-hero">
@@ -189,12 +223,6 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
           </div>
         </div>
       </div>
-
-      {/* Map widget i18n + init script */}
-      <script dangerouslySetInnerHTML={{ __html: `
-        window.MW_LANG = ${JSON.stringify(mwStrings)};
-      `}} />
-      <script src="https://ik.imagekit.io/bwvxkqzwak0rq/static/js/map-widget.js" />
 
       {/* ── "Discover Unique Tours" section ── */}
       <section className="bg_white margin_60_30">
@@ -291,24 +319,59 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
             <p>{t['home.text31'] ?? 'Every traveler has a dream destination.'}</p>
             <span><em /></span>
           </div>
+
+          {/* Row 1: one big card + two stacked in right column */}
           <div className="row">
-            {FEATURED.map((f, i) => (
-              <div key={f.href} className={i === 0 ? 'col-md-8' : 'col-md-4'}>
-                <div className="img_wrapper_grid">
-                  <div className="ribbon"><span>{t['popular'] ?? 'Popular'}</span></div>
+            <div className="col-md-8">
+              <div className="img_wrapper_grid">
+                <div className="ribbon"><span>{t['{popular}'] ?? 'Popular'}</span></div>
+                <div className="img_container_grid">
+                  <Link href={`/${lang}/${FEATURED_ROW1_BIG.href}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${FEATURED_ROW1_BIG.img}.jpg`} className="img-responsive" alt={FEATURED_ROW1_BIG.alt} loading="eager" />
+                    <div className="short_info_grid">
+                      <h3>{t['{usa}'] ?? FEATURED_ROW1_BIG.label}</h3>
+                      <em>{FEATURED_ROW1_BIG.sub}</em>
+                      <p>{t['{read_more}'] ?? 'Read More'}</p>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4">
+              {FEATURED_ROW1_STACK.map(f => (
+                <div key={f.href} className="img_wrapper_grid">
+                  <div className="ribbon"><span>{t['{popular}'] ?? 'Popular'}</span></div>
                   <div className="img_container_grid">
                     <Link href={`/${lang}/${f.href}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg`}
-                        className="img-responsive"
-                        alt={f.alt}
-                        loading={i === 0 ? 'eager' : 'lazy'}
-                      />
+                      <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg`} className="img-responsive" alt={f.alt} loading="lazy" />
                       <div className="short_info_grid">
                         <h3>{f.label}</h3>
                         <em>{f.sub}</em>
-                        <p>{t['read_more'] ?? 'Read More'}</p>
+                        <p>{t['{read_more}'] ?? 'Read More'}</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2: three equal cards */}
+          <div className="row">
+            {FEATURED_ROW2.map(f => (
+              <div key={f.href} className="col-md-4">
+                <div className="img_wrapper_grid">
+                  <div className="ribbon top"><span>{t['{top_rated}'] ?? 'Top Rated'}</span></div>
+                  <div className="img_container_grid">
+                    <Link href={`/${lang}/${f.href}`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg`} className="img-responsive" alt={f.alt} loading="lazy" />
+                      <div className="short_info_grid">
+                        <h3>{f.label}</h3>
+                        <em>{f.sub}</em>
+                        <p>{t['{read_more}'] ?? 'Read More'}</p>
                       </div>
                     </Link>
                   </div>
@@ -319,37 +382,28 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
         </div>
       </div>
 
-      {/* ── Explore category pages ── */}
-      <section className="bg_white margin_60_30">
+      {/* ── Explore the World ── */}
+      <section className="bg_blue explore-section">
         <div className="container">
           <div className="main_title">
-            <h2>{t['explore'] ?? 'Explore'} <strong>{t['the_world'] ?? 'the World'}</strong></h2>
-            <p>{t['explore_subtitle'] ?? 'Discover top attractions, historic cities, natural wonders and adventure destinations.'}</p>
+            <h2>{t['{explore}'] ?? 'Explore'} <strong>{t['{the_world}'] ?? 'the World'}</strong></h2>
+            <p>{t['{explore_subtitle}'] ?? 'Discover top attractions, historic cities, natural wonders and adventure destinations.'}</p>
             <span><em /></span>
           </div>
-          <div className="row">
+          <div className="row explore-cards">
             {[
-              { href: `/${lang}/attractions`,            label: t['top_attractions'] ?? 'Top Attractions',    desc: t['explore_attractions_desc'] ?? '',  cta: t['cta_attractions']  ?? 'Browse attractions',     img: 'agra'       },
-              { href: `/${lang}/best-historical-cities`, label: t['historical_cities'] ?? 'Historical Cities', desc: t['explore_historical_desc'] ?? '',   cta: t['cta_historical']   ?? 'Browse historical cities', img: 'jerusalem'  },
-              { href: `/${lang}/top-natural-places`,     label: t['natural_places'] ?? 'Natural Places',       desc: t['explore_natural_desc'] ?? '',      cta: t['cta_natural']      ?? 'Discover natural places',  img: 'plitvice-lakes' },
-              { href: `/${lang}/adventurous-things-to-do`, label: t['adventure_travel'] ?? 'Adventure Travel', desc: t['explore_adventure_desc'] ?? '',   cta: t['cta_adventure']    ?? 'Find adventures',          img: 'arenal'     },
+              { num: '01', href: `/${lang}/attractions`,              label: t['{top_attractions}']  ?? 'Top Attractions',    desc: t['{explore_attractions_desc}'] ?? '', cta: t['{cta_attractions}']  ?? 'Browse attractions'      },
+              { num: '02', href: `/${lang}/best-historical-cities`,   label: t['{historical_cities}'] ?? 'Historical Cities',  desc: t['{explore_historical_desc}']  ?? '', cta: t['{cta_historical}']   ?? 'Browse historical cities' },
+              { num: '03', href: `/${lang}/top-natural-places`,       label: t['{natural_places}']   ?? 'Natural Places',      desc: t['{explore_natural_desc}']     ?? '', cta: t['{cta_natural}']      ?? 'Discover natural places'  },
+              { num: '04', href: `/${lang}/adventurous-things-to-do`, label: t['{adventure_travel}'] ?? 'Adventure Travel',    desc: t['{explore_adventure_desc}']   ?? '', cta: t['{cta_adventure}']    ?? 'Find adventures'          },
             ].map(cat => (
               <div key={cat.href} className="col-md-3 col-sm-6">
-                <div className="img_wrapper">
-                  <div className="img_container">
-                    <Link href={cat.href}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img loading="lazy" src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${cat.img}.jpg`} className="img-responsive" alt={cat.label} />
-                      <div className="short_info">
-                        <h3>{cat.label}</h3>
-                        <em>{cat.desc}</em>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-                <div className="text-center" style={{ marginTop: 8 }}>
-                  <Link href={cat.href} className="button button_outline button_small">{cat.cta}</Link>
-                </div>
+                <Link href={cat.href} className="explore-card">
+                  <div className="explore-card__num">{cat.num}</div>
+                  <h3>{cat.label}</h3>
+                  <p>{cat.desc}</p>
+                  <span className="explore-card__cta">{cat.cta} &rarr;</span>
+                </Link>
               </div>
             ))}
           </div>

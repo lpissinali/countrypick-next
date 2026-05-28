@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import type { Lang } from '@/types';
 
@@ -13,6 +14,31 @@ interface HeaderProps {
 
 export default function Header({ lang, t }: HeaderProps) {
   const router = useRouter();
+
+  useEffect(() => {
+    const toggle = document.querySelector<HTMLButtonElement>('.lang-dropdown__toggle');
+    const menu   = document.querySelector<HTMLElement>('.lang-dropdown__menu');
+    if (!toggle || !menu) return;
+
+    function handleToggle(e: MouseEvent) {
+      e.stopPropagation();
+      const isOpen = menu!.classList.toggle('is-open');
+      toggle!.setAttribute('aria-expanded', String(isOpen));
+    }
+    function handleOutside(e: MouseEvent) {
+      if (!(e.target as Element).closest('.lang-dropdown')) {
+        menu!.classList.remove('is-open');
+        toggle!.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    toggle.addEventListener('click', handleToggle);
+    document.addEventListener('click', handleOutside);
+    return () => {
+      toggle.removeEventListener('click', handleToggle);
+      document.removeEventListener('click', handleOutside);
+    };
+  }, []);
 
   /** Build the same URL in a different language */
   function langUrl(newLang: string): string {
@@ -37,7 +63,8 @@ export default function Header({ lang, t }: HeaderProps) {
           <nav className="col--md-8 col-sm-9 col-xs-8">
             <a
               className="cmn-toggle-switch cmn-toggle-switch__htx open_close"
-              href="javascript:void(0);"
+              href="#"
+              onClick={e => e.preventDefault()}
               aria-label="Open menu"
             >
               <span>Menu mobile</span>
