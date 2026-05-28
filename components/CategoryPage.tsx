@@ -44,7 +44,7 @@ export default function CategoryPage({
     : `${heroTitle[0]} ${heroTitle[1]}`;
 
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents} hideExplore>
+    <Layout lang={lang} t={t} seo={seo} continents={continents}>
 
       {/* ── Banner ── */}
       <section className="parallax_window_in" style={{ backgroundImage: `url(${bgUrl})` }}>
@@ -86,4 +86,4 @@ export default function CategoryPage({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         loading="lazy"
-                        src={`${IK}/tr:w-400,h-2
+                        src={`${IK}/tr:w-400,h-270,f-auto/st
