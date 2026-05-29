@@ -117,6 +117,11 @@ interface Props {
 
 const GMAPS_KEY = 'AIzaSyDn5CY3I4ScUsPB-zW1PYDpvvWPdLOdB-g';
 
+/** Strip HTML tags so additionalInformation JSON can be parsed by initMap(). */
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]*>/g, '').trim();
+}
+
 const CityPage: NextPage<Props> = ({
   lang, country, gem, things, hotels: hotelsProp, relatedGems, continents, t, cityPrep, countryPrep,
 }) => {
@@ -252,7 +257,7 @@ const CityPage: NextPage<Props> = ({
                                   <input
                                     className="marker-info"
                                     type="hidden"
-                                    value={thing.additionalInformation}
+                                    value={stripHtml(thing.additionalInformation)}
                                     readOnly
                                   />
                                 )}
@@ -294,6 +299,4 @@ const CityPage: NextPage<Props> = ({
                                 <div className="content-c">
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
                                   <img loading="lazy" className="logo-c"
-                                    src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg"
-                                    alt="Agoda hotels" />
-                                  <div className="hotel-name">{h.hotelNa
+                                    src="https://ik.imagekit.io/b
