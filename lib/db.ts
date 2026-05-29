@@ -14,8 +14,9 @@ export function getPool(): mysql.Pool {
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_DATABASE || 'countrypick',
       waitForConnections: true,
-      connectionLimit: 5,
+      connectionLimit: 20,
       queueLimit: 0,
+      connectTimeout: 60000,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
     });
   }
@@ -25,7 +26,8 @@ export function getPool(): mysql.Pool {
 /** Convenience wrapper — returns rows typed as T[]. */
 export async function query<T = Record<string, unknown>>(
   sql: string,
-  values?: unknown[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  values?: any[]
 ): Promise<T[]> {
   const [rows] = await getPool().execute(sql, values);
   return rows as T[];

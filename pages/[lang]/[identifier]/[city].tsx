@@ -299,4 +299,154 @@ const CityPage: NextPage<Props> = ({
                                 <div className="content-c">
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
                                   <img loading="lazy" className="logo-c"
-                                    src="https://ik.imagekit.io/b
+                                    src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg"
+                                    alt="Agoda hotels" />
+                                  <div className="hotel-name">{h.hotelName}</div>
+                                  <div className="rating-location-c">
+                                    <i className={`rating-c ficon ficon-star-${h.starRating} orange-yellow`} />
+                                    <div className="location-c">
+                                      <i className="ficon ficon-pin-star" />
+                                      <span className="location">{h.cityName}, {h.countryName}</span>
+                                    </div>
+                                  </div>
+                                  <div className="rating-offer-c">
+                                    <span className="rating-text">{h.reviewScoreText}</span>
+                                    <span className="rating-value">{h.reviewScore}</span>
+                                  </div>
+                                  <div className="price-c">${h.dailyRate}</div>
+                                </div>
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* GetYourGuide activities */}
+                    <p className="text-center margin_30">
+                      <a
+                        href={`https://www.getyourguide.com/s/?q=${encodeURIComponent(gem.name)}&partner_id=NILVP6C&utm_medium=online_publisher&placement=content-end`}
+                        className="button"
+                        target="_blank"
+                        rel="nofollow noreferrer"
+                      >
+                        {activitiesLabel}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* AdSense bottom */}
+            <ins
+              className="adsbygoogle"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-4831931651277615"
+              data-ad-slot="5242394336"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            />
+            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+          </div>
+
+          {/* ── Sidebar ── */}
+          <aside className="col-md-3 theiaStickySidebar" id="sidebar">
+            {relatedGems.length > 0 && (
+              <div className="side_box">
+                <div className="main_title">
+                  <h4>
+                    {t['country.text5'] ?? 'Best Things To Do In'}{' '}
+                    <strong>{country.name}</strong>
+                  </h4>
+                  <span><em /></span>
+                </div>
+                <div className="list_tabs">
+                  <ul>
+                    {relatedGems.map(g => (
+                      <li key={g.id}>
+                        <div>
+                          <Link href={`/${lang}/${country.identifier}/${g.identifier}`}>
+                            <figure>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg`}
+                                alt={g.name}
+                                className="img-rounded"
+                              />
+                            </figure>
+                            <h3>{t['country.side11'] ?? 'Best Places'} {countryPrep} {g.name}</h3>
+                            <small>{country.name}</small>
+                          </Link>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* AdSense sidebar */}
+            <ins
+              className="adsbygoogle"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-4831931651277615"
+              data-ad-slot="5242394336"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            />
+            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+          </aside>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default CityPage;
+
+// ─── Data fetching ─────────────────────────────────────────────────────────────
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = await getAllCityPaths();
+  return { paths, fallback: false };
+};
+
+export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+  const lang           = (params?.lang       as Lang)   ?? 'en';
+  const identifier     = (params?.identifier as string) ?? '';
+  const cityIdentifier = (params?.city       as string) ?? '';
+
+  const country = await getCountryByIdentifier(identifier, lang);
+  if (!country) return { notFound: true };
+
+  const gem = await getGemByIdentifier(cityIdentifier, identifier, lang);
+  if (!gem)  return { notFound: true };
+
+  const [things, allGems, continents, hotels] = await Promise.all([
+    getGemWithThings(gem.id),
+    getGemsByCountry(country.id),
+    getFooterContinents(lang),
+    fetchAgodaHotels(gem.cityId, gem.name, country.name),
+  ]);
+
+  const relatedGems = allGems.filter(g => g.id !== gem.id).slice(0, 8);
+  const t           = getTranslations(lang);
+  const cityPrep    = getCityPrep(gem.name, lang);
+  const countryPrep = getCountryPrep(country.alpha2, lang);
+
+  return {
+    props: {
+      lang,
+      country:     JSON.parse(JSON.stringify(country)),
+      gem:         JSON.parse(JSON.stringify(gem)),
+      things:      JSON.parse(JSON.stringify(things)),
+      hotels,
+      relatedGems: JSON.parse(JSON.stringify(relatedGems)),
+      continents,
+      t,
+      cityPrep,
+      countryPrep,
+    },
+  };
+};

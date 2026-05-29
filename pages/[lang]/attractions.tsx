@@ -162,4 +162,79 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents }) => {
           </div>
 
           {ATTRACTION_ITEMS.map((item, i) => {
-         
+            const itemTitle = item.titleKey
+              ? (t[item.titleKey] ?? item.titleFixed ?? '')
+              : (item.titleFixed ?? '');
+            const country  = t[item.countryKey] ?? '';
+            const subtitle = t[item.subtitleKey] ?? '';
+            const desc     = t[item.descKey]    ?? '';
+            const cta      = t[item.ctaKey]     ?? '';
+
+            return (
+              <div key={item.href + i} className="strip_list">
+                <div className="row">
+                  <div className="col-sm-4">
+                    <div className="img_wrapper">
+                      <div className="img_container">
+                        <Link href={`/${lang}/${item.href}`}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            loading={i < 2 ? 'eager' : 'lazy'}
+                            src={`${IK}/tr:w-400,h-270,f-auto/static/img/gems/${item.img}.jpg`}
+                            width={400} height={270}
+                            className="img-responsive"
+                            alt={itemTitle}
+                          />
+                          <div className="short_info">
+                            <h3>{itemTitle}</h3>
+                            <em>{country}</em>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-8">
+                    <div className="desc">
+                      {subtitle && (
+                        <h4>
+                          {subtitle}
+                          {item.subtitleBellissima && <>{' '}<em>bellissima</em></>}
+                        </h4>
+                      )}
+                      {desc && <p>{desc}</p>}
+                      {cta && (
+                        <div>
+                          <a
+                            href={item.gygUrl}
+                            rel="nofollow"
+                            target="_blank"
+                            className="button small"
+                          >
+                            {cta}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default AttractionsPage;
+
+export const getStaticPaths: GetStaticPaths = async () => ({
+  paths: LANGS.map(lang => ({ params: { lang } })),
+  fallback: false,
+});
+
+export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+  const lang = (params?.lang as Lang) ?? 'en';
+  const continents = await getFooterContinents(lang);
+  return { props: { lang, t: getTranslations(lang), continents } };
+};

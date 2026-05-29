@@ -86,4 +86,29 @@ export default function CategoryPage({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         loading="lazy"
-                        src={`${IK}/tr:w-400,h-270,f-auto/st
+                        src={`${IK}/tr:w-400,h-270,f-auto/static/img/gems/${item.img}.jpg`}
+                        width={400} height={270}
+                        className="img-responsive"
+                        alt={item.label}
+                        srcSet={[200,400,800].map(w =>
+                          `${IK}/tr:w-${w},h-${Math.round(w*270/400)},f-auto/static/img/gems/${item.img}.jpg ${w}w`
+                        ).join(', ')}
+                        sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 991px) 220px, 360px"
+                      />
+                      <div className="short_info">
+                        <h3>{item.label}</h3>
+                        {item.country && <em>{item.country}</em>}
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+
+    </Layout>
+  );
+}
