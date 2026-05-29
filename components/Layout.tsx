@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Seo from './Seo';
@@ -14,13 +15,9 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, lang, t, seo, continents, hideExplore }: LayoutProps) {
-  return (
-    <>
-      <Seo {...seo} lang={lang} />
-      <div className="layer" />
-      <Header lang={lang} t={t} />
-      {children}
-      <Footer lang={lang} t={t} continents={continents} hideExplore={hideExplore} />
-    </>
-  );
-}
+  // Set the lang cookie so common_scripts_min.js can read it for #lang-selector
+  useEffect(() => {
+    document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+  }, [lang]);
+
+  return
