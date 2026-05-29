@@ -147,9 +147,9 @@ const CityPage: NextPage<Props> = ({
                       <>
                         <div className="city_map hidden" />
                         <ul className="cbp_tmtimeline js-count-list">
-                          {things.map(thing => (
+                          {things.map((thing, idx) => (
                             <li key={thing.id}>
-                              <div className="cbp_tmicon" />
+                              <div className="cbp_tmicon">{idx + 1}</div>
                               <div className="cbp_tmlabel">
                                 <h3>{thing.title}</h3>
                                 {thing.additionalInformation && (
@@ -315,7 +315,4 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       continents,
       t,
       cityPrep,
-      countryPrep,
-    },
-  };
-};
+      countryP
