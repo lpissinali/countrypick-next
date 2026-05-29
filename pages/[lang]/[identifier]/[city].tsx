@@ -115,7 +115,7 @@ interface Props {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-const GMAPS_KEY = 'NEXT_PUBLIC_GMAPS_KEY_REDACTED';
+const GMAPS_KEY = process.env.NEXT_PUBLIC_GMAPS_KEY ?? '';
 
 /** Strip HTML tags so additionalInformation JSON can be parsed by initMap(). */
 function stripHtml(s: string): string {
