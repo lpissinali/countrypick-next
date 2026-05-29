@@ -102,7 +102,7 @@ interface Props {
   country:     Country;
   gem:         Gem;
   things:      Thing[];
-  hotels:      AgodaHotel[];
+  hotels:      AgodaHotel[] | undefined;
   relatedGems: Gem[];
   continents:  FooterContinent[];
   t:           Record<string, string>;
@@ -115,8 +115,9 @@ interface Props {
 const GMAPS_KEY = 'AIzaSyDn5CY3I4ScUsPB-zW1PYDpvvWPdLOdB-g';
 
 const CityPage: NextPage<Props> = ({
-  lang, country, gem, things, hotels, relatedGems, continents, t, cityPrep, countryPrep,
+  lang, country, gem, things, hotels: hotelsProp, relatedGems, continents, t, cityPrep, countryPrep,
 }) => {
+  const hotels = hotelsProp ?? [];
   const alpha2Lower  = country.alpha2.toLowerCase();
   const heroImage    = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
   const gemImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`;
@@ -294,5 +295,4 @@ const CityPage: NextPage<Props> = ({
                                     alt="Agoda hotels" />
                                   <div className="hotel-name">{h.hotelName}</div>
                                   <div className="rating-location-c">
-                                    <i className={`rating-c ficon ficon-star-${h.starRating} orange-yellow`} />
-       
+                                    <i className={`rating-c 
