@@ -386,16 +386,16 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
       <section className="bg_blue explore-section">
         <div className="container">
           <div className="main_title">
-            <h3>{t['explore'] ?? 'Explore'} <strong>{t['the_world'] ?? 'the World'}</strong></h3>
-            <p>{t['explore_subtitle'] ?? 'Discover top attractions, historic cities, natural wonders and adventure destinations across every country on earth.'}</p>
+            <h2>{t['{explore}'] ?? 'Explore'} <strong>{t['{the_world}'] ?? 'the World'}</strong></h2>
+            <p>{t['{explore_subtitle}'] ?? 'Discover top attractions, historic cities, natural wonders and adventure destinations.'}</p>
             <span><em /></span>
           </div>
           <div className="row explore-cards">
             {[
-              { num: '01', href: `/${lang}/attractions`,              label: t['top_attractions']  ?? 'Top Attractions',    desc: t['explore_attractions_desc'] ?? '', cta: t['cta_attractions']  ?? 'Browse attractions'      },
-              { num: '02', href: `/${lang}/best-historical-cities`,   label: t['historical_cities'] ?? 'Historical Cities',  desc: t['explore_historical_desc']  ?? '', cta: t['cta_historical']   ?? 'Browse historical cities' },
-              { num: '03', href: `/${lang}/top-natural-places`,       label: t['natural_places']   ?? 'Natural Places',      desc: t['explore_natural_desc']     ?? '', cta: t['cta_natural']      ?? 'Discover natural places'  },
-              { num: '04', href: `/${lang}/adventurous-things-to-do`, label: t['adventure_travel'] ?? 'Adventure Travel',    desc: t['explore_adventure_desc']   ?? '', cta: t['cta_adventure']    ?? 'Find adventures'          },
+              { num: '01', href: `/${lang}/attractions`,              label: t['{top_attractions}']  ?? 'Top Attractions',    desc: t['{explore_attractions_desc}'] ?? '', cta: t['{cta_attractions}']  ?? 'Browse attractions'      },
+              { num: '02', href: `/${lang}/best-historical-cities`,   label: t['{historical_cities}'] ?? 'Historical Cities',  desc: t['{explore_historical_desc}']  ?? '', cta: t['{cta_historical}']   ?? 'Browse historical cities' },
+              { num: '03', href: `/${lang}/top-natural-places`,       label: t['{natural_places}']   ?? 'Natural Places',      desc: t['{explore_natural_desc}']     ?? '', cta: t['{cta_natural}']      ?? 'Discover natural places'  },
+              { num: '04', href: `/${lang}/adventurous-things-to-do`, label: t['{adventure_travel}'] ?? 'Adventure Travel',    desc: t['{explore_adventure_desc}']   ?? '', cta: t['{cta_adventure}']    ?? 'Find adventures'          },
             ].map(cat => (
               <div key={cat.href} className="col-md-3 col-sm-6">
                 <Link href={cat.href} className="explore-card">

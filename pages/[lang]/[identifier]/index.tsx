@@ -137,7 +137,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
                   {/* AdSense */}
                   <div className="row">
                     <div className="col-xs-12 add_bottom_30">
-                      <ins suppressHydrationWarning
+                      <ins
                         className="adsbygoogle"
                         style={{ display: 'block' }}
                         data-ad-client="ca-pub-4831931651277615"
@@ -180,7 +180,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
             </div>
 
             {/* AdSense bottom */}
-            <ins suppressHydrationWarning
+            <ins
               className="adsbygoogle"
               style={{ display: 'block' }}
               data-ad-client="ca-pub-4831931651277615"
@@ -229,7 +229,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
             )}
 
             {/* AdSense sidebar */}
-            <ins suppressHydrationWarning
+            <ins
               className="adsbygoogle"
               style={{ display: 'block' }}
               data-ad-client="ca-pub-4831931651277615"

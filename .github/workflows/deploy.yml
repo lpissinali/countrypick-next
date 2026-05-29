@@ -1,8 +1,9 @@
 name: Build & Deploy to Firebase Hosting
 
 on:
-  # Auto-deploy disabled: DB is local and not reachable from CI.
+  # Auto-deploy disabled: DB is local (127.0.0.1) and not reachable from CI.
   # Build locally with `npm run build` and deploy with `firebase deploy`.
+  # Re-enable push trigger when a cloud-accessible DB is configured.
   workflow_dispatch:
 
 jobs:
@@ -30,7 +31,6 @@ jobs:
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           DB_SSL:      ${{ secrets.DB_SSL }}
           NEXT_PUBLIC_AGODA_AUTH: ${{ secrets.NEXT_PUBLIC_AGODA_AUTH }}
-          NEXT_PUBLIC_GMAPS_KEY:  ${{ secrets.NEXT_PUBLIC_GMAPS_KEY }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0

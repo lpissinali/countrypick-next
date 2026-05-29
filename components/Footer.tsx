@@ -88,8 +88,10 @@ export default function Footer({ lang, t, continents, hideExplore }: FooterProps
         </div>
       </footer>
 
-      {/* Site JS (menu toggle etc.) — served from ImageKit CDN */}
-      <script src="https://ik.imagekit.io/bwvxkqzwak0rq/static/js/common_scripts_min.js" async />
+      {/* Site JS — afterInteractive ensures it runs AFTER React hydration,
+          preventing DOM mutations (sticky class, lang-selector, etc.)
+          from racing with the hydration pass. */}
+      <Script src="/static/js/common_scripts_min.js" strategy="afterInteractive" />
       <script dangerouslySetInnerHTML={{ __html: `
         (function() {
           var dropdown = document.getElementById('langDropdown');

@@ -39,4 +39,3 @@ export default function Layout({ children, lang, t, seo, continents, hideExplore
     </>
   );
 }
-

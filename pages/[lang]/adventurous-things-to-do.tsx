@@ -51,4 +51,6 @@ export const getStaticPaths: GetStaticPaths = async () => ({
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
-  const continents = await getFooterCont
+  const continents = await getFooterContinents(lang);
+  return { props: { lang, t: getTranslations(lang), continents } };
+};
