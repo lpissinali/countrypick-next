@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Script from 'next/script';
 import type { Lang, FooterContinent } from '@/types';
 
 interface FooterProps {

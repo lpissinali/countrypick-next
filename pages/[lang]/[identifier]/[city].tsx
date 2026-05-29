@@ -232,7 +232,7 @@ const CityPage: NextPage<Props> = ({
                     )}
 
                     {/* AdSense */}
-                    <ins
+                    <ins suppressHydrationWarning
                       className="adsbygoogle"
                       style={{ display: 'block' }}
                       data-ad-client="ca-pub-4831931651277615"
