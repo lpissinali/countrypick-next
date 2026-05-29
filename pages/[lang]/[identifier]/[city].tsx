@@ -74,6 +74,9 @@ async function fetchAgodaHotels(
       headers: { Authorization: auth, 'Content-Type': 'application/json' },
       body,
     });
+    if (!res.ok) return [];
+    const ct = res.headers.get('content-type') ?? '';
+    if (!ct.includes('application/json')) return [];
     const data = await res.json();
     return (data.results ?? []).map((h: Record<string, unknown>) => ({
       hotelId:         h.hotelId as number,
@@ -90,7 +93,7 @@ async function fetchAgodaHotels(
       cityName,
       countryName,
     }));
-  } catch {
+  } catch (_e) {
     return [];
   }
 }
@@ -293,6 +296,4 @@ const CityPage: NextPage<Props> = ({
                                   <img loading="lazy" className="logo-c"
                                     src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg"
                                     alt="Agoda hotels" />
-                                  <div className="hotel-name">{h.hotelName}</div>
-                                  <div className="rating-location-c">
-                                    <i className={`rating-c 
+                                  <div className="hotel-name">{h.hotelNa
