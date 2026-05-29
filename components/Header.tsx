@@ -49,7 +49,7 @@ export default function Header({ lang, t }: HeaderProps) {
   }
 
   return (
-    <header className="sticky">
+    <header suppressHydrationWarning>
       <div className="container-fluid">
         <div className="row">
           <div className="col--md-4 col-sm-3 col-xs-4">
