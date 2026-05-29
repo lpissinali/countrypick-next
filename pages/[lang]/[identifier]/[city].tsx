@@ -1,6 +1,6 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import Script from 'next/script';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import Layout from '@/components/Layout';
 import {
   getAllCityPaths,
@@ -15,28 +15,112 @@ import { getCityPrep, getCountryPrep } from '@/lib/prepositions';
 import { buildHreflang, cityJsonLd, BASE_URL } from '@/lib/seo';
 import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
 
-// Load Agoda hotels client-side only (no SSG needed, always fresh)
-const AgodaHotels = dynamic(() => import('@/components/AgodaHotels'), { ssr: false });
+// ─── Agoda hotel type ─────────────────────────────────────────────────────────
+
+interface AgodaHotel {
+  hotelId:         number;
+  hotelName:       string;
+  starRating:      number;   // already ×10 (e.g. 45 = 4.5 stars)
+  reviewScore:     number;
+  reviewScoreText: string;
+  dailyRate:       number;
+  imageURL:        string;
+  landingURL:      string;
+  cityName:        string;
+  countryName:     string;
+}
+
+function reviewLabel(score: number): string {
+  if (score >= 9) return 'Exceptional';
+  if (score >= 8) return 'Excellent';
+  if (score >= 7) return 'Very Good';
+  if (score >= 6) return 'Good';
+  return 'Review Score';
+}
+
+/** Fetch Agoda hotels at build time (server-side — HTTP allowed, no mixed-content issue). */
+async function fetchAgodaHotels(
+  cityId: number,
+  cityName: string,
+  countryName: string,
+): Promise<AgodaHotel[]> {
+  if (!cityId) return [];
+  const auth = process.env.NEXT_PUBLIC_AGODA_AUTH ?? process.env.AGODA_AUTH ?? '';
+  if (!auth) return [];
+
+  const checkIn  = new Date(); checkIn.setMonth(checkIn.getMonth() + 1);
+  const checkOut = new Date(checkIn); checkOut.setDate(checkOut.getDate() + 2);
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+  const body = JSON.stringify({
+    criteria: {
+      additional: {
+        currency: 'USD', dailyRate: { maximum: 10000, minimum: 1 },
+        discountOnly: false, language: 'en-us', maxResult: 3,
+        minimumReviewScore: 0, minimumStarRating: 0,
+        occupancy: { numberOfAdult: 2, numberOfChildren: 0 },
+        sortBy: 'Recommended',
+      },
+      checkInDate: fmt(checkIn),
+      checkOutDate: fmt(checkOut),
+      cityId,
+    },
+  });
+
+  try {
+    const res = await fetch('http://affiliateapi7643.agoda.com/affiliateservice/lt_v1', {
+      method: 'POST',
+      headers: { Authorization: auth, 'Content-Type': 'application/json' },
+      body,
+    });
+    const data = await res.json();
+    return (data.results ?? []).map((h: Record<string, unknown>) => ({
+      hotelId:         h.hotelId as number,
+      hotelName:       h.hotelName as string,
+      starRating:      Math.round((h.starRating as number) * 10),
+      reviewScore:     h.reviewScore as number,
+      reviewScoreText: reviewLabel(h.reviewScore as number),
+      dailyRate:       Math.round((h.dailyRate as number) * 100) / 100,
+      imageURL: ((h.imageURL as string) ?? '')
+        .replace('http://pix6.agoda.net', 'https://ik.imagekit.io/bwvxkqzwak0rq')
+        .replace('http://q-xx.bstatic.com', 'https://q-xx.bstatic.com')
+        .replace('?s=800x600', '/tr:w-252'),
+      landingURL:  h.landingURL as string,
+      cityName,
+      countryName,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  lang: Lang;
-  country: Country;
-  gem: Gem;
-  things: Thing[];
-  relatedGems: Gem[];   // other cities in this country → sidebar internal links
-  continents: FooterContinent[];
-  t: Record<string, string>;
-  cityPrep: string;
+  lang:        Lang;
+  country:     Country;
+  gem:         Gem;
+  things:      Thing[];
+  hotels:      AgodaHotel[];
+  relatedGems: Gem[];
+  continents:  FooterContinent[];
+  t:           Record<string, string>;
+  cityPrep:    string;
   countryPrep: string;
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+const GMAPS_KEY = 'NEXT_PUBLIC_GMAPS_KEY_REDACTED';
+
 const CityPage: NextPage<Props> = ({
-  lang, country, gem, things, relatedGems, continents, t, cityPrep, countryPrep,
+  lang, country, gem, things, hotels, relatedGems, continents, t, cityPrep, countryPrep,
 }) => {
-  const alpha2Lower   = country.alpha2.toLowerCase();
-  const heroImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
-  const gemImage      = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`;
-  const canonicalUrl  = `${BASE_URL}/${lang}/${country.identifier}/${gem.identifier}`;
+  const alpha2Lower  = country.alpha2.toLowerCase();
+  const heroImage    = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
+  const gemImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`;
+  const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}/${gem.identifier}`;
 
   const description = `${t['city.description'] ?? 'Looking for the best things to do'}${cityPrep}${gem.name}? ${t['city.description2'] ?? 'Discover top attractions, activities and tours.'}`;
   const title       = `${t['city.title'] ?? 'Best Things To Do'}${cityPrep}${gem.name}, ${country.name} | ${t['city.title2'] ?? 'Travel Guide | Country Pick'}`;
@@ -58,16 +142,24 @@ const CityPage: NextPage<Props> = ({
     }),
   };
 
-  const hotelsLabel = `${t['city.text6'] ?? 'Best Places To Stay'}${cityPrep}${gem.name}`;
+  const hotelsLabel    = `${t['city.text6'] ?? 'Best Places To Stay'}${cityPrep}${gem.name}`;
   const activitiesLabel = `${country.name} ${t['city.text7'] ?? 'Activities'}${cityPrep}${gem.name}`;
+
+  const hasMapData = things.some(th => th.additionalInformation);
 
   return (
     <Layout lang={lang} t={t} seo={seo} continents={continents}>
+
+      {/* Google Maps API — only loaded when there are marker-info items */}
+      {hasMapData && (
+        <Script
+          src={`https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&libraries=places&callback=initMap&language=${lang}&loading=async`}
+          strategy="afterInteractive"
+        />
+      )}
+
       {/* Hero header */}
-      <section
-        className="parallax_window_in"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
+      <section className="parallax_window_in" style={{ backgroundImage: `url(${heroImage})` }}>
         <div id="sub_content_in">
           <div id="sub_content_in_left">
             <div className="container">
@@ -96,13 +188,13 @@ const CityPage: NextPage<Props> = ({
       {/* Main content */}
       <div className="container margin_60">
         <div className="row">
+
           {/* ── Left column ── */}
           <div className="col-md-9">
             <div className="box_style-content">
               <div id="gems" className="tab-pane active">
                 <div className="box_style_general">
 
-                  {/* Page title */}
                   <div className="main_title add_bottom_30">
                     <h1 className="page-title">
                       {t['city.text1'] ?? 'Best'}{' '}
@@ -113,11 +205,10 @@ const CityPage: NextPage<Props> = ({
                     <span><em /></span>
                   </div>
 
-                  {/* City block */}
                   <div className="city-block">
                     {/* City hero image */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         loading="lazy"
                         src={gemImage}
@@ -142,9 +233,10 @@ const CityPage: NextPage<Props> = ({
                     />
                     <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
 
-                    {/* Things to do — timeline list */}
+                    {/* Things to do — timeline + map */}
                     {things.length > 0 && (
                       <>
+                        {/* city_map starts hidden; initMap() reveals it when marker data is present */}
                         <div className="city_map hidden" />
                         <ul className="cbp_tmtimeline js-count-list">
                           {things.map((thing, idx) => (
@@ -182,137 +274,25 @@ const CityPage: NextPage<Props> = ({
                       </>
                     )}
 
-                    {/* Agoda hotels — loads client-side */}
-                    <AgodaHotels
-                      cityId={gem.cityId}
-                      cityName={gem.name}
-                      countryName={country.name}
-                      label={hotelsLabel}
-                    />
-
-                    {/* GetYourGuide activities link */}
-                    <p className="text-center margin_30">
-                      <a
-                        href={`https://www.getyourguide.com/s/?q=${encodeURIComponent(gem.name)}&partner_id=NILVP6C&utm_medium=online_publisher&placement=content-end`}
-                        className="button"
-                        target="_blank"
-                        rel="nofollow noreferrer"
-                      >
-                        {activitiesLabel}
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* AdSense bottom */}
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-4831931651277615"
-              data-ad-slot="5242394336"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
-          </div>
-
-          {/* ── Sidebar ── */}
-          <aside className="col-md-3 theiaStickySidebar" id="sidebar">
-            {/* More cities in this country */}
-            {relatedGems.length > 0 && (
-              <div className="side_box">
-                <div className="main_title">
-                  <h4>
-                    {t['country.text5'] ?? 'Best Things To Do In'}{' '}
-                    <strong>{country.name}</strong>
-                  </h4>
-                  <span><em /></span>
-                </div>
-                <div className="list_tabs">
-                  <ul>
-                    {relatedGems.map(g => (
-                      <li key={g.id}>
-                        <div>
-                          <Link href={`/${lang}/${country.identifier}/${g.identifier}`}>
-                            <figure>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${g.identifier}.jpg`}
-                                alt={g.name}
-                                className="img-rounded"
-                              />
-                            </figure>
-                            <h3>{t['country.side11'] ?? 'Best Places'} {countryPrep} {g.name}</h3>
-                            <small>{country.name}</small>
-                          </Link>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* AdSense sidebar */}
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-4831931651277615"
-              data-ad-slot="5242394336"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
-          </aside>
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default CityPage;
-
-// ─── Data fetching ─────────────────────────────────────────────────────────────
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = await getAllCityPaths();
-  return { paths, fallback: false };
-};
-
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-  const lang             = (params?.lang       as Lang)   ?? 'en';
-  const identifier       = (params?.identifier as string) ?? '';
-  const cityIdentifier   = (params?.city       as string) ?? '';
-
-  const country = await getCountryByIdentifier(identifier, lang);
-  if (!country) return { notFound: true };
-
-  const gem = await getGemByIdentifier(cityIdentifier, identifier, lang);
-  if (!gem)  return { notFound: true };
-
-  const [things, allGems, continents] = await Promise.all([
-    getGemWithThings(gem.id),
-    getGemsByCountry(country.id),
-    getFooterContinents(lang),
-  ]);
-
-  // Related gems for sidebar — exclude the current city
-  const relatedGems = allGems.filter(g => g.id !== gem.id).slice(0, 8);
-
-  const t           = getTranslations(lang);
-  const cityPrep    = getCityPrep(gem.name, lang);
-  const countryPrep = getCountryPrep(country.alpha2, lang);
-
-  return {
-    props: {
-      lang,
-      country:     JSON.parse(JSON.stringify(country)),
-      gem:         JSON.parse(JSON.stringify(gem)),
-      things:      JSON.parse(JSON.stringify(things)),
-      relatedGems: JSON.parse(JSON.stringify(relatedGems)),
-      continents,
-      t,
-      cityPrep,
-      countryP
+                    {/* Agoda hotels — pre-fetched at build time */}
+                    {hotels.length > 0 && (
+                      <div>
+                        <h2 className="main_title">{hotelsLabel}</h2>
+                        <div className="hotels-list">
+                          {hotels.map(h => (
+                            <div key={h.hotelId} className="hotel-item">
+                              <a href={h.landingURL} target="_blank" rel="nofollow noreferrer">
+                                <div className="background-c">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img loading="lazy" src={h.imageURL} height={168} width={252}
+                                    alt={`${h.hotelName} - ${h.cityName}`} />
+                                </div>
+                                <div className="content-c">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img loading="lazy" className="logo-c"
+                                    src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg"
+                                    alt="Agoda hotels" />
+                                  <div className="hotel-name">{h.hotelName}</div>
+                                  <div className="rating-location-c">
+                                    <i className={`rating-c ficon ficon-star-${h.starRating} orange-yellow`} />
+       
