@@ -1,27 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Global styles — site CSS is loaded from ImageKit CDN in _document.tsx */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Google Maps InfoWindow close button ────────────────────────────────────
+   styles.min.css uses margin:3px on img, but newer Maps API versions render
+   the close icon as an SVG/span inside .gm-ui-hover-effect. Use flexbox so
+   the icon is always centered regardless of the Maps API version.           */
+.gm-ui-hover-effect {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  top: 5px !important;
+  right: 5px !important;
+  opacity: 1 !important;
+}
+.gm-ui-hover-effect img,
+.gm-ui-hover-effect span,
+.gm-ui-hover-effect svg {
+  margin: 0 !important;
+  width: 14px !important;
+  height: 14px !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
