@@ -557,7 +557,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   // Exclude the current gem, then pick 8 deterministically using the gem identifier as seed.
   // Each city page gets a unique but stable set — good for SEO (no duplicate sidebars).
   const sidebarGems = seededShuffle(
-    allGems.filter(g => g.id !== gem.id),
+    allGems.filter(g => g.identifier !== gem.identifier),
     gem.identifier,
   ).slice(0, 8);
 
@@ -568,11 +568,12 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 
   // Find nearby gems using Haversine distance from this gem's coordinate centre.
   // Falls back to same-country gems if no coordinate data exists for this gem.
-  const currentCoord = gemCoords.find(g => g.id === gem.id);
+  // Match by identifier (not id) — gemCoords is EN-only so ids differ across languages.
+  const currentCoord = gemCoords.find(g => g.identifier === gem.identifier);
   let nearbyGems: NearbyGem[];
   if (currentCoord?.lat != null && currentCoord?.lng != null) {
     nearbyGems = gemCoords
-      .filter(g => g.id !== gem.id && g.lat != null && g.lng != null)
+      .filter(g => g.identifier !== gem.identifier && g.lat != null && g.lng != null)
       .map(g => ({
         ...g,
         distKm: Math.round(haversineKm(currentCoord.lat!, currentCoord.lng!, g.lat!, g.lng!)),
@@ -581,7 +582,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       .slice(0, 4);
   } else {
     nearbyGems = gemCoords
-      .filter(g => g.id !== gem.id && g.countryIdentifier === country.identifier)
+      .filter(g => g.identifier !== gem.identifier && g.countryIdentifier === country.identifier)
       .slice(0, 4)
       .map(g => ({ ...g, distKm: null }));
   }

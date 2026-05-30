@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/generate-sitemap.mjs",
     "build": "next build",
-    "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "next lint",
     "deploy": "next build && firebase deploy"
@@ -15,8 +15,7 @@
     "react-dom": "^18",
     "next": "14.2.35",
     "client-only": "^0.0.1",
-    "mysql2": "^3.11.0",
-    "next-sitemap": "^4.2.3"
+    "mysql2": "^3.11.0"
   },
   "devDependencies": {
     "typescript": "^5",
