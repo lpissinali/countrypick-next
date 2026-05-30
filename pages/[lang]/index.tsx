@@ -2,17 +2,22 @@ import { useEffect, useRef } from 'react';
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
-import { getFooterContinents } from '@/lib/queries';
+import { getFooterContinents, getAllCountries } from '@/lib/queries';
 import { getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL, WEBSITE_LD, ORG_LD } from '@/lib/seo';
 import { type Lang, type FooterContinent } from '@/types';
+import CountryQuiz from '@/components/CountryQuiz';
+import { COUNTRY_TAGS } from '@/lib/quiz-data';
+import type { QuizCountry } from '@/lib/quiz-data';
+import { getSeasonInfo } from '@/lib/season-data';
 
 interface Props {
   lang: Lang;
   t: Record<string, string>;
   continents: FooterContinent[];
   activeLangs: { code: string; name: string }[];
+  quizCountries: QuizCountry[];
 }
 
 type FeaturedItem = { img: string; alt: string; href: string; label: string; sub: string; ribbon?: string };
@@ -27,7 +32,7 @@ const FEATURED_ROW2: FeaturedItem[] = [
   { img: 'ca', alt: 'Canada Tours', href: 'canada', label: 'Canada', sub: 'Ottawa',         ribbon: 'top_rated' },
 ];
 
-const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
+const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCountries }) => {
   const canonical = `${BASE_URL}/${lang}`;
   const title       = t['home.title']       ?? 'Visited Countries Map Generator | Travel Tips & Things to Do | Country Pick';
   const description = t['home.description'] ?? 'Create your own visited countries map for free with Country Pick!';
@@ -232,6 +237,9 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
         </div>
       </div>
 
+      {/* ── Countries You Might Like Quiz ── */}
+      <CountryQuiz lang={lang} t={t} countries={quizCountries} />
+
       {/* ── "Discover Unique Tours" section ── */}
       <section className="bg_white margin_60_30">
         <div className="container">
@@ -430,8 +438,26 @@ export const getStaticPaths: GetStaticPaths = async () => ({
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
-  const [continents] = await Promise.all([getFooterContinents(lang)]);
+  const [continents, allCountries] = await Promise.all([
+    getFooterContinents(lang),
+    getAllCountries(lang),
+  ]);
   const t = getTranslations(lang);
   const activeLangs = await getActiveLangs();
-  return { props: { activeLangs, lang, t, continents } };
+
+  // Build the quiz country list: only countries that have both tags and season data
+  const quizCountries: QuizCountry[] = allCountries
+    .filter(c => COUNTRY_TAGS[c.alpha2])
+    .map(c => {
+      const season = getSeasonInfo(c.alpha2);
+      return {
+        identifier: c.identifier,
+        alpha2:     c.alpha2,
+        name:       c.name,
+        tags:       COUNTRY_TAGS[c.alpha2] ?? [],
+        bestMonths: season?.bestMonths ?? [],
+      };
+    });
+
+  return { props: { activeLangs, lang, t, continents, quizCountries } };
 };
