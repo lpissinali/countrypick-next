@@ -24,6 +24,7 @@ interface Props {
   heroSub:       string;   // subtitle under the h1
   items:         CategoryItem[];
   breadcrumbKey?: string;  // i18n key for breadcrumb e.g. 'adventure_travel'
+  activeLangs: { code: string; name: string }[];
 }
 
 const IK = 'https://ik.imagekit.io/bwvxkqzwak0rq';
@@ -31,7 +32,7 @@ const IK = 'https://ik.imagekit.io/bwvxkqzwak0rq';
 export default function CategoryPage({
   lang, t, continents, seo,
   heroImg, heroLabel, heroTitle, heroSub,
-  items, breadcrumbKey,
+  items, breadcrumbKey, activeLangs,
 }: Props) {
 
   // heroImg can be a slug like 'nz.jpg' or a full URL
@@ -44,7 +45,7 @@ export default function CategoryPage({
     : `${heroTitle[0]} ${heroTitle[1]}`;
 
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents}>
+    <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
 
       {/* ── Banner ── */}
       <section className="parallax_window_in" style={{ backgroundImage: `url(${bgUrl})` }}>

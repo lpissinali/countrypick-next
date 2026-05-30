@@ -1,13 +1,14 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import CategoryPage, { type CategoryItem } from '@/components/CategoryPage';
-import { getFooterContinents } from '@/lib/queries';
+import { getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL } from '@/lib/seo';
-import { LANGS, type Lang, type FooterContinent } from '@/types';
+import { type Lang, type FooterContinent } from '@/types';
 
-interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[] }
+interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
+}
 
-const AdventurePage: NextPage<Props> = ({ lang, t, continents }) => {
+const AdventurePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical   = `${BASE_URL}/${lang}/adventurous-things-to-do`;
   const title       = t['adventure.title']       ?? 'Adventurous Things To Do Around the World | CountryPick.com';
   const description = t['adventure.description'] ?? 'Top places around the world for adventure lovers to visit.';
@@ -26,7 +27,7 @@ const AdventurePage: NextPage<Props> = ({ lang, t, continents }) => {
 
   return (
     <CategoryPage
-      lang={lang} t={t} continents={continents}
+      activeLangs={activeLangs} lang={lang} t={t} continents={continents}
       seo={{ title, description, canonical, hreflang: buildHreflang('/adventurous-things-to-do') }}
       heroImg="nz.jpg"
       heroLabel={t['adventure_travel'] ?? 'Adventure Travel'}
@@ -45,12 +46,14 @@ const AdventurePage: NextPage<Props> = ({ lang, t, continents }) => {
 export default AdventurePage;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: LANGS.map(lang => ({ params: { lang } })),
+  paths: (await getActiveLangs()).map(l => ({ params: { lang: l.code } })),
   fallback: false,
 });
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
-  return { props: { lang, t: getTranslations(lang), continents } };
+    const activeLangs = await getActiveLangs();
+  return { props: { activeLangs,
+      lang, t: getTranslations(lang), continents } };
 };

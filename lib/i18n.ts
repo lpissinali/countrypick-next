@@ -50,8 +50,12 @@ function loadLocale(lang: Lang): Translations {
   if (cache[lang]) return cache[lang]!;
 
   const filePath = path.join(process.cwd(), 'locales', `locale_${lang}.ini`);
-  const content  = fs.readFileSync(filePath, 'utf-8');
-  cache[lang]    = parseIni(content);
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    cache[lang]   = parseIni(content);
+  } catch {
+    cache[lang] = {}; // missing locale file — pages use hardcoded defaults
+  }
   return cache[lang]!;
 }
 

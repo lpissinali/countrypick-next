@@ -5,14 +5,14 @@ import type { Lang } from '@/types';
 
 const LANG_FLAG: Record<string, string> = { en: 'us', pt: 'br', es: 'es', ru: 'ru' };
 const LANG_NAME: Record<string, string> = { en: 'English', pt: 'Português', es: 'Español', ru: 'Русский' };
-const LANGS = ['en', 'pt', 'es', 'ru'];
 
 interface HeaderProps {
   lang: Lang;
   t: Record<string, string>;
+  activeLangs: { code: string; name: string }[];
 }
 
-export default function Header({ lang, t }: HeaderProps) {
+export default function Header({ lang, t, activeLangs }: HeaderProps) {
   const router = useRouter();
 
   useEffect(() => {
@@ -40,10 +40,9 @@ export default function Header({ lang, t }: HeaderProps) {
     };
   }, []);
 
-  /** Build the same URL in a different language */
   function langUrl(newLang: string): string {
-    const path = router.asPath; // e.g. /en/moldova
-    const parts = path.split('/').filter(Boolean); // ['en', 'moldova']
+    const path = router.asPath;
+    const parts = path.split('/').filter(Boolean);
     parts[0] = newLang;
     return '/' + parts.join('/');
   }
@@ -70,7 +69,6 @@ export default function Header({ lang, t }: HeaderProps) {
               <span>Menu mobile</span>
             </a>
 
-            {/* Language selector */}
             <div className="lang-dropdown" id="langDropdown">
               <button
                 className="lang-dropdown__toggle"
@@ -86,26 +84,25 @@ export default function Header({ lang, t }: HeaderProps) {
                 />
               </button>
               <ul className="lang-dropdown__menu">
-                {LANGS.map(l => (
-                  <li key={l}>
+                {activeLangs.map(l => (
+                  <li key={l.code}>
                     <Link
-                      href={langUrl(l)}
-                      className={`lang-dropdown__item${lang === l ? ' is-active' : ''}`}
+                      href={langUrl(l.code)}
+                      className={`lang-dropdown__item${lang === l.code ? ' is-active' : ''}`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={`/static/img/flags/${LANG_FLAG[l] ?? l}.png`}
-                        alt={l}
+                        src={`/static/img/flags/${LANG_FLAG[l.code] ?? l.code}.png`}
+                        alt={l.code}
                         className="lang-flag-item"
                       />
-                      <span>{LANG_NAME[l]}</span>
+                      <span>{l.name}</span>
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Main navigation */}
             <div className="main-menu">
               <div id="header_menu">
                 <Link href={`/${lang}`} title="Country Pick">

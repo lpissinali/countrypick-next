@@ -3,14 +3,16 @@ import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { getFooterContinents } from '@/lib/queries';
+import { getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL, WEBSITE_LD, ORG_LD } from '@/lib/seo';
-import { LANGS, type Lang, type FooterContinent } from '@/types';
+import { type Lang, type FooterContinent } from '@/types';
 
 interface Props {
   lang: Lang;
   t: Record<string, string>;
   continents: FooterContinent[];
+  activeLangs: { code: string; name: string }[];
 }
 
 type FeaturedItem = { img: string; alt: string; href: string; label: string; sub: string; ribbon?: string };
@@ -25,7 +27,7 @@ const FEATURED_ROW2: FeaturedItem[] = [
   { img: 'ca', alt: 'Canada Tours', href: 'canada', label: 'Canada', sub: 'Ottawa',         ribbon: 'top_rated' },
 ];
 
-const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
+const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical = `${BASE_URL}/${lang}`;
   const title       = t['home.title']       ?? 'Visited Countries Map Generator | Travel Tips & Things to Do | Country Pick';
   const description = t['home.description'] ?? 'Create your own visited countries map for free with Country Pick!';
@@ -144,7 +146,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
   }, []);
 
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents}>
+    <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
       {/* ── Map Widget ── */}
       <div className="map-widget-wrap">
         <div className="mw-hero">
@@ -416,7 +418,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents }) => {
 export default HomePage;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: LANGS.map(lang => ({ params: { lang } })),
+  paths: (await getActiveLangs()).map(l => ({ params: { lang: l.code } })),
   fallback: false,
 });
 
@@ -424,5 +426,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const [continents] = await Promise.all([getFooterContinents(lang)]);
   const t = getTranslations(lang);
-  return { props: { lang, t, continents } };
+  const activeLangs = await getActiveLangs();
+  return { props: { activeLangs, lang, t, continents } };
 };

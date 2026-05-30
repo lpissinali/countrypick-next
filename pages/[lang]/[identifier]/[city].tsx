@@ -9,7 +9,9 @@ import {
   getGemWithThings,
   getGemsByCountry,
   getFooterContinents,
+  getActiveLangs,
 } from '@/lib/queries';
+import { query } from '@/lib/db';
 import { getTranslations } from '@/lib/i18n';
 import { getCityPrep, getCountryPrep } from '@/lib/prepositions';
 import { buildHreflang, cityJsonLd, BASE_URL } from '@/lib/seo';
@@ -111,19 +113,26 @@ interface Props {
   t:           Record<string, string>;
   cityPrep:    string;
   countryPrep: string;
+  activeLangs: { code: string; name: string }[];
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const GMAPS_KEY = process.env.NEXT_PUBLIC_GMAPS_KEY ?? '';
 
-/** Strip HTML tags so additionalInformation JSON can be parsed by initMap(). */
-function stripHtml(s: string): string {
-  return s.replace(/<[^>]*>/g, '').trim();
+/** Strip HTML tags and return the value only if it is valid JSON (for initMap). */
+function extractMarkerJson(s: string): string | null {
+  const stripped = s.replace(/<[^>]*>/g, '').trim();
+  try {
+    JSON.parse(stripped);
+    return stripped;
+  } catch {
+    return null;
+  }
 }
 
 const CityPage: NextPage<Props> = ({
-  lang, country, gem, things, hotels: hotelsProp, relatedGems, continents, t, cityPrep, countryPrep,
+  lang, country, gem, things, hotels: hotelsProp, relatedGems, continents, t, cityPrep, countryPrep, activeLangs,
 }) => {
   const hotels = hotelsProp ?? [];
   const alpha2Lower  = country.alpha2.toLowerCase();
@@ -154,10 +163,10 @@ const CityPage: NextPage<Props> = ({
   const hotelsLabel    = `${t['city.text6'] ?? 'Best Places To Stay'}${cityPrep}${gem.name}`;
   const activitiesLabel = `${country.name} ${t['city.text7'] ?? 'Activities'}${cityPrep}${gem.name}`;
 
-  const hasMapData = things.some(th => th.additionalInformation);
+  const hasMapData = things.some(th => th.additionalInformation && extractMarkerJson(th.additionalInformation) !== null);
 
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents}>
+    <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
 
       {/* Google Maps API — only loaded when there are marker-info items */}
       {hasMapData && (
@@ -253,11 +262,11 @@ const CityPage: NextPage<Props> = ({
                               <div className="cbp_tmicon">{idx + 1}</div>
                               <div className="cbp_tmlabel">
                                 <h3>{thing.title}</h3>
-                                {thing.additionalInformation && (
+                                {thing.additionalInformation && extractMarkerJson(thing.additionalInformation) !== null && (
                                   <input
                                     className="marker-info"
                                     type="hidden"
-                                    value={stripHtml(thing.additionalInformation)}
+                                    value={extractMarkerJson(thing.additionalInformation)!}
                                     readOnly
                                   />
                                 )}
@@ -440,6 +449,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       lang,
       country:     JSON.parse(JSON.stringify(country)),
       gem:         JSON.parse(JSON.stringify(gem)),
+      activeLangs: await getActiveLangs(),
       things:      JSON.parse(JSON.stringify(things)),
       hotels,
       relatedGems: JSON.parse(JSON.stringify(relatedGems)),

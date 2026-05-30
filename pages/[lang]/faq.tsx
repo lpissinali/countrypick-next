@@ -1,13 +1,14 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import StaticPage from '@/components/StaticPage';
-import { getFooterContinents } from '@/lib/queries';
+import { getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL } from '@/lib/seo';
 import { LANGS, type Lang, type FooterContinent } from '@/types';
 
-interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[] }
+interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
+}
 
-const FaqPage: NextPage<Props> = ({ lang, t, continents }) => {
+const FaqPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical   = `${BASE_URL}/${lang}/faq`;
   const title       = t['faq.title']       ?? 'Frequently Asked Questions | Country Pick';
   const description = t['faq.description'] ?? 'Frequently asked questions about Country Pick. Find answers about exploring countries and discovering top things to do around the world.';
@@ -20,7 +21,7 @@ const FaqPage: NextPage<Props> = ({ lang, t, continents }) => {
   };
 
   return (
-    <StaticPage lang={lang} t={t} continents={continents} seo={seo} breadcrumb={t['{faq}'] ?? 'FAQ'}>
+    <StaticPage activeLangs={activeLangs} lang={lang} t={t} continents={continents} seo={seo} breadcrumb={t['{faq}'] ?? 'FAQ'}>
       <div className="main_title add_bottom_30">
         <h3>Frequently Asked <strong>Questions</strong></h3>
         <span><em /></span>
@@ -169,5 +170,7 @@ export const getStaticPaths: GetStaticPaths = async () => ({
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
-  return { props: { lang, t: getTranslations(lang), continents } };
+    const activeLangs = await getActiveLangs();
+  return { props: { activeLangs,
+      lang, t: getTranslations(lang), continents } };
 };

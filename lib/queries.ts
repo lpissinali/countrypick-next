@@ -177,6 +177,14 @@ function toImageSlug(name: string): string {
 }
 
 /** Build all [lang, identifier] pairs for getStaticPaths on country pages. */
+/** Returns active languages from the languages table. */
+export async function getActiveLangs(): Promise<{ code: string; name: string }[]> {
+  const rows = await query<{ value: string; name: string }>(
+    'SELECT value, name FROM languages WHERE is_active = 1 ORDER BY sort ASC'
+  );
+  return rows.map(r => ({ code: r.value.toLowerCase(), name: r.name }));
+}
+
 export async function getAllCountryPaths(): Promise<
   { params: { lang: string; identifier: string } }[]
 > {

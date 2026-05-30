@@ -1,14 +1,15 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import StaticPage from '@/components/StaticPage';
-import { getFooterContinents } from '@/lib/queries';
+import { getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL } from '@/lib/seo';
 import { LANGS, type Lang, type FooterContinent } from '@/types';
 
-interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[] }
+interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
+}
 
-const TermsPage: NextPage<Props> = ({ lang, t, continents }) => {
+const TermsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical   = `${BASE_URL}/${lang}/terms`;
   const title       = 'Terms and Conditions - Country Pick';
   const description = 'Read the Terms and Conditions governing your use of Country Pick, the travel platform for exploring countries and discovering hidden gems worldwide.';
@@ -32,7 +33,7 @@ const TermsPage: NextPage<Props> = ({ lang, t, continents }) => {
   };
 
   return (
-    <StaticPage lang={lang} t={t} continents={continents} seo={seo} breadcrumb={t['{terms_conditions}'] ?? 'Terms and Conditions'}>
+    <StaticPage activeLangs={activeLangs} lang={lang} t={t} continents={continents} seo={seo} breadcrumb={t['{terms_conditions}'] ?? 'Terms and Conditions'}>
       <div className="main_title add_bottom_30">
         <h3>Terms and <strong>Conditions</strong></h3>
         <p>Last updated: April 25, 2026</p>
@@ -112,5 +113,7 @@ export const getStaticPaths: GetStaticPaths = async () => ({
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
-  return { props: { lang, t: getTranslations(lang), continents } };
+    const activeLangs = await getActiveLangs();
+  return { props: { activeLangs,
+      lang, t: getTranslations(lang), continents } };
 };

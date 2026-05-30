@@ -13,11 +13,12 @@ interface Props {
   seo:        PageSEO;
   breadcrumb: string;          // label for the current page in breadcrumb
   children:   React.ReactNode;
+  activeLangs: { code: string; name: string }[];
 }
 
-export default function StaticPage({ lang, t, continents, seo, breadcrumb, children }: Props) {
+export default function StaticPage({ lang, t, continents, seo, breadcrumb, children, activeLangs }: Props) {
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents} hideExplore>
+    <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents} hideExplore>
       {/* Hero */}
       <section
         className="parallax_window_in"

@@ -1,9 +1,10 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
-import { getAllCountryPaths, getCountryByIdentifier, getGemsWithThingsByCountry, getFooterContinents } from '@/lib/queries';
+import { query } from '@/lib/db';
+import { getAllCountryPaths, getCountryByIdentifier, getGemsWithThingsByCountry, getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
-import { getCountryPrep } from '@/lib/prepositions';
+import { getCountryPrep, getCityPrep } from '@/lib/prepositions';
 import { buildHreflang, countryJsonLd, BASE_URL } from '@/lib/seo';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 
@@ -14,9 +15,10 @@ interface Props {
   continents: FooterContinent[];
   t: Record<string, string>;
   countryPrep: string;
+  activeLangs: { code: string; name: string }[];
 }
 
-const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, countryPrep }) => {
+const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, countryPrep, activeLangs }) => {
   const alpha2Lower = country.alpha2.toLowerCase();
   const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}`;
@@ -42,7 +44,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
   };
 
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents}>
+    <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
       {/* Hero / parallax header */}
       <section
         className="parallax_window_in"
@@ -217,7 +219,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
                                 className="img-rounded"
                               />
                             </figure>
-                            <h3>{gem.things.length > 0 ? gem.things.length : ''} {t['country.side11'] ?? 'Best Places'}{' in '}{gem.name}</h3>
+                            <h3>{gem.things.length > 0 ? gem.things.length : ''} {t['country.side11'] ?? 'Best Places'}{getCityPrep(gem.name, lang)}{gem.name}</h3>
                             <small>{country.name}</small>
                           </Link>
                         </div>
@@ -268,9 +270,11 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 
   const t           = getTranslations(lang);
   const countryPrep = getCountryPrep(country.alpha2, lang);
+  const activeLangs = await getActiveLangs();
 
   return {
     props: {
+      activeLangs,
       lang,
       country: JSON.parse(JSON.stringify(country)),
       gems:    JSON.parse(JSON.stringify(gems)),

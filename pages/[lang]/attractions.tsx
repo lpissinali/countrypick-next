@@ -2,11 +2,13 @@ import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { getFooterContinents } from '@/lib/queries';
+import { getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL } from '@/lib/seo';
-import { LANGS, type Lang, type FooterContinent } from '@/types';
+import { type Lang, type FooterContinent } from '@/types';
 
-interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[] }
+interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
+}
 
 const IK = 'https://ik.imagekit.io/bwvxkqzwak0rq';
 
@@ -121,7 +123,7 @@ const ATTRACTION_ITEMS: AttractionItem[] = [
   },
 ];
 
-const AttractionsPage: NextPage<Props> = ({ lang, t, continents }) => {
+const AttractionsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical   = `${BASE_URL}/${lang}/attractions`;
   const title       = t['attractions.title']       ?? 'Top Attractions Around The World | Country Pick';
   const description = t['attractions.description'] ?? 'Discover amazing tours, top things to do and the best attractions around the world.';
@@ -129,7 +131,7 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents }) => {
   const seo = { title, description, canonical, hreflang: buildHreflang('/attractions') };
 
   return (
-    <Layout lang={lang} t={t} seo={seo} continents={continents}>
+    <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
       {/* Hero */}
       <section className="parallax_window_in" style={{ backgroundImage: 'url(https://ik.imagekit.io/bwvxkqzwak0rq/static/img/sub_header_florence_2.jpg)' }}>
         <div id="sub_content_in">
@@ -229,12 +231,13 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents }) => {
 export default AttractionsPage;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: LANGS.map(lang => ({ params: { lang } })),
+  paths: (await getActiveLangs()).map(l => ({ params: { lang: l.code } })),
   fallback: false,
 });
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
-  return { props: { lang, t: getTranslations(lang), continents } };
+  const activeLangs = await getActiveLangs();
+  return { props: { activeLangs, lang, t: getTranslations(lang), continents } };
 };

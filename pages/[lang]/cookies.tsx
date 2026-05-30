@@ -1,14 +1,15 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import StaticPage from '@/components/StaticPage';
-import { getFooterContinents } from '@/lib/queries';
+import { getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL } from '@/lib/seo';
 import { LANGS, type Lang, type FooterContinent } from '@/types';
 
-interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[] }
+interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
+}
 
-const CookiesPage: NextPage<Props> = ({ lang, t, continents }) => {
+const CookiesPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical   = `${BASE_URL}/${lang}/cookies`;
   const title       = 'Cookies Policy - Country Pick';
   const description = 'Learn how Country Pick uses cookies and similar technologies to operate the website and serve relevant advertising.';
@@ -32,7 +33,7 @@ const CookiesPage: NextPage<Props> = ({ lang, t, continents }) => {
   };
 
   return (
-    <StaticPage lang={lang} t={t} continents={continents} seo={seo} breadcrumb={t['{cookies_policy}'] ?? 'Cookies Policy'}>
+    <StaticPage activeLangs={activeLangs} lang={lang} t={t} continents={continents} seo={seo} breadcrumb={t['{cookies_policy}'] ?? 'Cookies Policy'}>
       <div className="main_title add_bottom_30">
         <h3>Cookies <strong>Policy</strong></h3>
         <p>Last updated: April 25, 2026</p>
@@ -148,5 +149,7 @@ export const getStaticPaths: GetStaticPaths = async () => ({
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
-  return { props: { lang, t: getTranslations(lang), continents } };
+    const activeLangs = await getActiveLangs();
+  return { props: { activeLangs,
+      lang, t: getTranslations(lang), continents } };
 };
