@@ -9,6 +9,8 @@ import { getCountryPrep, getCityPrep } from '@/lib/prepositions';
 import { buildHreflang, countryJsonLd, BASE_URL } from '@/lib/seo';
 import { buildCountryFaqs, faqJsonLd } from '@/lib/faqs';
 import type { FAQ } from '@/lib/faqs';
+import { getSeasonInfo } from '@/lib/season-data';
+import type { SeasonInfo } from '@/lib/season-data';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -32,10 +34,23 @@ interface Props {
   t: Record<string, string>;
   countryPrep: string;
   faqs: FAQ[];
+  season: SeasonInfo | null;
   activeLangs: { code: string; name: string }[];
 }
 
-const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, faqs, activeLangs }) => {
+const MONTH_KEYS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH_KEYS_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MONTH_KEYS_ES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MONTH_KEYS_RU = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+
+function monthLabels(lang: string): string[] {
+  if (lang === 'pt') return MONTH_KEYS_PT;
+  if (lang === 'es') return MONTH_KEYS_ES;
+  if (lang === 'ru') return MONTH_KEYS_RU;
+  return MONTH_KEYS_EN;
+}
+
+const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, faqs, season, activeLangs }) => {
   const alpha2Lower = country.alpha2.toLowerCase();
   const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}`;
@@ -195,6 +210,42 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                       ))}
                     </div>
                   )}
+                  {/* Best time to visit */}
+                  {season && (
+                    <div className="season-section add_bottom_30">
+                      <div className="main_title add_bottom_30">
+                        <h2>{t['country.season_title'] ?? 'Best Time to'} <strong>{t['country.season_title2'] ?? 'Visit'} {country.name}</strong></h2>
+                        <span><em /></span>
+                      </div>
+                      <p className="season-desc">
+                        {lang === 'pt' ? season.desc.pt : lang === 'es' ? season.desc.es : season.desc.en}
+                      </p>
+                      <div className="season-strip">
+                        {monthLabels(lang).map((label, i) => {
+                          const m = i + 1;
+                          const isBest = season.bestMonths.includes(m);
+                          const isPeak = season.peakMonths.includes(m);
+                          return (
+                            <div
+                              key={m}
+                              className={`season-month${isBest ? ' best' : isPeak ? ' peak' : ''}`}
+                            >
+                              <span>{label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="season-legend">
+                        <span className="legend-best" />
+                        <span>{t['country.season_best'] ?? 'Best time'}</span>
+                        <span className="legend-peak" />
+                        <span>{t['country.season_peak'] ?? 'Peak season'}</span>
+                        <span className="legend-off" />
+                        <span>{t['country.season_off'] ?? 'Off season'}</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* FAQ section */}
                   {faqs.length > 0 && (
                     <div className="faq-section add_bottom_30">
@@ -307,6 +358,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const t           = getTranslations(lang);
   const countryPrep = getCountryPrep(country.alpha2, lang);
   const faqs        = buildCountryFaqs(t, country, gems.map(g => g.name));
+  const season      = getSeasonInfo(country.alpha2);
   const activeLangs = await getActiveLangs();
 
   return {
@@ -320,6 +372,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       t,
       countryPrep,
       faqs,
+      season,
     },
   };
 };
