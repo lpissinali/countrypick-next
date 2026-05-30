@@ -163,7 +163,7 @@ const FaqPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
 export default FaqPage;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: LANGS.map(lang => ({ params: { lang } })),
+  paths: (await getActiveLangs()).map(l => ({ params: { lang: l.code } })),
   fallback: false,
 });
 

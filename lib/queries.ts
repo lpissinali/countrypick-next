@@ -8,7 +8,8 @@ import type { Lang, Country, Gem, GemWithThings, Thing, FooterContinent } from '
 // ─── Countries ────────────────────────────────────────────────────────────────
 
 export async function getAllCountries(lang: Lang): Promise<Country[]> {
-  return query<Country>(`
+  type Row = Omit<Country, 'continent'> & { continentId: number | null; continentName: string | null };
+  const rows = await query<Row>(`
     SELECT
       c.id,
       c.countryName  AS name,
@@ -22,21 +23,26 @@ export async function getAllCountries(lang: Lang): Promise<Country[]> {
       c.language,
       c.language_name AS languageName,
       c.iata,
-      con.id         AS 'continent.id',
-      con.name       AS 'continent.name'
+      con.id         AS continentId,
+      con.name       AS continentName
     FROM loccountries c
     LEFT JOIN loccontinents con ON con.id = c.continent_id
                                AND con.language_name = c.language_name
     WHERE c.language_name = ? AND c.status = 1
     ORDER BY c.countryName ASC
   `, [lang.toUpperCase()]);
+  return rows.map(({ continentId, continentName, ...rest }) => ({
+    ...rest,
+    continent: continentId != null ? { id: continentId, name: continentName ?? '' } : undefined,
+  })) as Country[];
 }
 
 export async function getCountryByIdentifier(
   identifier: string,
   lang: Lang
 ): Promise<Country | null> {
-  const rows = await query<Country>(`
+  type Row = Omit<Country, 'continent'> & { continentId: number | null; continentName: string | null };
+  const rows = await query<Row>(`
     SELECT
       c.id,
       c.countryName  AS name,
@@ -50,8 +56,8 @@ export async function getCountryByIdentifier(
       c.language,
       c.language_name AS languageName,
       c.iata,
-      con.id         AS 'continent.id',
-      con.name       AS 'continent.name'
+      con.id         AS continentId,
+      con.name       AS continentName
     FROM loccountries c
     LEFT JOIN loccontinents con ON con.id = c.continent_id
                                AND con.language_name = c.language_name
@@ -59,7 +65,12 @@ export async function getCountryByIdentifier(
     LIMIT 1
   `, [identifier, lang.toUpperCase()]);
 
-  return rows[0] ?? null;
+  if (!rows[0]) return null;
+  const { continentId, continentName, ...rest } = rows[0];
+  return {
+    ...rest,
+    continent: continentId != null ? { id: continentId, name: continentName ?? '' } : undefined,
+  } as Country;
 }
 
 // ─── Gems (cities/areas) ──────────────────────────────────────────────────────
@@ -303,9 +314,10 @@ export async function getAllCountryPaths(): Promise<
 > {
   type Row = { identifier: string; languageName: string };
   const rows = await query<Row>(`
-    SELECT identifier, language_name AS languageName
-    FROM loccountries
-    WHERE status = 1
+    SELECT c.identifier, c.language_name AS languageName
+    FROM loccountries c
+    JOIN languages l ON UPPER(l.value) = c.language_name AND l.is_active = 1
+    WHERE c.status = 1
   `);
   return rows.map(r => ({
     params: { lang: r.languageName.toLowerCase(), identifier: r.identifier },
@@ -324,6 +336,7 @@ export async function getAllCityPaths(): Promise<
       g.identifier           AS gemIdentifier
     FROM gems g
     JOIN loccountries c ON c.id = g.country_id
+    JOIN languages l ON UPPER(l.value) = c.language_name AND l.is_active = 1
     WHERE c.status = 1
   `);
   return rows.map(r => ({

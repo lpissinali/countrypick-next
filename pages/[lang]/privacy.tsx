@@ -258,7 +258,7 @@ const PrivacyPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
 export default PrivacyPage;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: LANGS.map(lang => ({ params: { lang } })),
+  paths: (await getActiveLangs()).map(l => ({ params: { lang: l.code } })),
   fallback: false,
 });
 

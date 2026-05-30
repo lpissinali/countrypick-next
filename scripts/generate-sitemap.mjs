@@ -15,7 +15,7 @@ import * as dotenv from 'process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BASE_URL   = 'https://www.countrypick.com';
 const TODAY      = new Date().toISOString().split('T')[0];
-const LANGS      = ['en', 'pt', 'es', 'ru'];
+// Active langs fetched from DB at runtime (see main())
 
 // ─── DB ──────────────────────────────────────────────────────────────────────
 
@@ -36,10 +36,17 @@ async function query(sql, values) {
 
 // ─── Paths ───────────────────────────────────────────────────────────────────
 
+async function getActiveLangs() {
+  const rows = await query(`SELECT LOWER(value) AS code FROM languages WHERE is_active = 1 ORDER BY sort ASC`);
+  return rows.map(r => r.code);
+}
+
 async function getAllCountryPaths() {
   const rows = await query(`
-    SELECT identifier, language_name AS languageName
-    FROM loccountries WHERE status = 1
+    SELECT c.identifier, c.language_name AS languageName
+    FROM loccountries c
+    JOIN languages l ON UPPER(l.value) = c.language_name AND l.is_active = 1
+    WHERE c.status = 1
   `);
   return rows.map(r => ({ lang: r.languageName.toLowerCase(), identifier: r.identifier }));
 }
@@ -51,24 +58,27 @@ async function getAllCityPaths() {
            g.identifier           AS gemIdentifier
     FROM gems g
     JOIN loccountries c ON c.id = g.country_id
+    JOIN languages l ON UPPER(l.value) = c.language_name AND l.is_active = 1
     WHERE c.status = 1
   `);
   return rows.map(r => ({ lang: r.lang, identifier: r.countryIdentifier, city: r.gemIdentifier }));
 }
 
-// ─── Static paths ─────────────────────────────────────────────────────────────
+// ─── Static paths built after fetching active langs ────────────────────────
 
-const STATIC = [
-  ...LANGS.map(l => ({ loc: `/${l}`,                             cf: 'weekly',  pri: 1.0, lm: TODAY })),
-  ...LANGS.flatMap(l =>
-    ['attractions','best-historical-cities','top-natural-places','adventurous-things-to-do']
-      .map(s => ({ loc: `/${l}/${s}`,                            cf: 'monthly', pri: 0.8, lm: TODAY }))
-  ),
-  ...LANGS.flatMap(l =>
-    ['faq','terms','privacy','cookies']
-      .map(s => ({ loc: `/${l}/${s}`,                            cf: 'yearly',  pri: 0.3, lm: '2026-05-30' }))
-  ),
-];
+function buildStaticPaths(langs) {
+  return [
+    ...langs.map(l => ({ loc: `/${l}`,                             cf: 'weekly',  pri: 1.0, lm: TODAY })),
+    ...langs.flatMap(l =>
+      ['attractions','best-historical-cities','top-natural-places','adventurous-things-to-do']
+        .map(s => ({ loc: `/${l}/${s}`,                            cf: 'monthly', pri: 0.8, lm: TODAY }))
+    ),
+    ...langs.flatMap(l =>
+      ['faq','terms','privacy','cookies']
+        .map(s => ({ loc: `/${l}/${s}`,                            cf: 'yearly',  pri: 0.3, lm: '2026-05-30' }))
+    ),
+  ];
+}
 
 // ─── XML ──────────────────────────────────────────────────────────────────────
 
@@ -86,7 +96,10 @@ function urlEntry(loc, cf, pri, lm) {
 async function main() {
   console.log('⏳  Generating sitemap…');
 
-  const [countries, cities] = await Promise.all([getAllCountryPaths(), getAllCityPaths()]);
+  const [langs, countries, cities] = await Promise.all([
+    getActiveLangs(), getAllCountryPaths(), getAllCityPaths(),
+  ]);
+  const STATIC = buildStaticPaths(langs);
 
   const entries = [
     ...STATIC.map(s => urlEntry(s.loc, s.cf, s.pri, s.lm)),

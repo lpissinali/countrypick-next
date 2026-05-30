@@ -76,7 +76,7 @@ async function fetchAgodaHotels(
   countryName: string,
 ): Promise<AgodaHotel[]> {
   if (!cityId) return [];
-  const auth = process.env.NEXT_PUBLIC_AGODA_AUTH ?? process.env.AGODA_AUTH ?? '';
+  const auth = process.env.AGODA_AUTH ?? '';
   if (!auth) return [];
 
   const checkIn  = new Date(); checkIn.setMonth(checkIn.getMonth() + 1);

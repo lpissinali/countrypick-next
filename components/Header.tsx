@@ -91,6 +91,12 @@ export default function Header({ lang, t, activeLangs }: HeaderProps) {
                     <Link
                       href={langUrl(l.code)}
                       className={`lang-dropdown__item${lang === l.code ? ' is-active' : ''}`}
+                      onClick={() => {
+                        const menu = document.querySelector<HTMLElement>('.lang-dropdown__menu');
+                        const toggle = document.querySelector<HTMLButtonElement>('.lang-dropdown__toggle');
+                        menu?.classList.remove('is-open');
+                        toggle?.setAttribute('aria-expanded', 'false');
+                      }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img

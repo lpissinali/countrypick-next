@@ -335,7 +335,7 @@ const CookiesPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
 export default CookiesPage;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: LANGS.map(lang => ({ params: { lang } })),
+  paths: (await getActiveLangs()).map(l => ({ params: { lang: l.code } })),
   fallback: false,
 });
 
