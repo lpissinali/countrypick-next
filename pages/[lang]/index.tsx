@@ -65,6 +65,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
     description,
     canonical,
     ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-1200,h-630,f-auto/static/img/it.jpg',
+    ogImageAlt: title,
     hreflang: buildHreflang(''),
     jsonLd,
   };

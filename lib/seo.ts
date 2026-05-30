@@ -47,14 +47,55 @@ export const WEBSITE_LD = {
   publisher: { '@id': `${BASE_URL}/#organization` },
 };
 
+/**
+ * Generic WebPage JSON-LD for category / static pages.
+ * Includes BreadcrumbList so every page gets the rich result.
+ */
+export function pageJsonLd(opts: {
+  url: string;
+  name: string;
+  description: string;
+  lang: Lang;
+  breadcrumbs: { name: string; item: string }[];
+}) {
+  const { url, name, description, lang, breadcrumbs } = opts;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      WEBSITE_LD,
+      ORG_LD,
+      {
+        '@type': 'WebPage',
+        '@id': `${url}/#webpage`,
+        url,
+        name,
+        description,
+        inLanguage: lang,
+        isPartOf: { '@id': `${BASE_URL}/#website` },
+        publisher: { '@id': `${BASE_URL}/#organization` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((b, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: b.name,
+          item: b.item,
+        })),
+      },
+    ],
+  };
+}
+
 export function countryJsonLd(opts: {
   name: string;
   identifier: string;
   lang: Lang;
   description: string;
   alpha2: string;
+  homeLabel?: string;
 }) {
-  const { name, identifier, lang, description, alpha2 } = opts;
+  const { name, identifier, lang, description, alpha2, homeLabel = 'Home' } = opts;
   const url = `${BASE_URL}/${lang}/${identifier}`;
   return {
     '@context': 'https://schema.org',
@@ -84,7 +125,7 @@ export function countryJsonLd(opts: {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${lang}` },
+          { '@type': 'ListItem', position: 1, name: homeLabel, item: `${BASE_URL}/${lang}` },
           { '@type': 'ListItem', position: 2, name, item: url },
         ],
       },
@@ -100,8 +141,9 @@ export function cityJsonLd(opts: {
   lang: Lang;
   description: string;
   imageSlug: string;
+  homeLabel?: string;
 }) {
-  const { cityName, countryName, gemIdentifier, countryIdentifier, lang, description, imageSlug } = opts;
+  const { cityName, countryName, gemIdentifier, countryIdentifier, lang, description, imageSlug, homeLabel = 'Home' } = opts;
   const countryUrl = `${BASE_URL}/${lang}/${countryIdentifier}`;
   const cityUrl    = `${countryUrl}/${gemIdentifier}`;
   return {
@@ -127,9 +169,9 @@ export function cityJsonLd(opts: {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home',       item: `${BASE_URL}/${lang}` },
-          { '@type': 'ListItem', position: 2, name: countryName,  item: countryUrl },
-          { '@type': 'ListItem', position: 3, name: cityName,     item: cityUrl },
+          { '@type': 'ListItem', position: 1, name: homeLabel,   item: `${BASE_URL}/${lang}` },
+          { '@type': 'ListItem', position: 2, name: countryName, item: countryUrl },
+          { '@type': 'ListItem', position: 3, name: cityName,    item: cityUrl },
         ],
       },
     ],

@@ -2,7 +2,7 @@ import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import CategoryPage, { type CategoryItem } from '@/components/CategoryPage';
 import { getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
-import { buildHreflang, BASE_URL } from '@/lib/seo';
+import { buildHreflang, pageJsonLd, BASE_URL } from '@/lib/seo';
 import { type Lang, type FooterContinent } from '@/types';
 
 interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
@@ -31,7 +31,19 @@ const HistoricalPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) =
   return (
     <CategoryPage
       activeLangs={activeLangs} lang={lang} t={t} continents={continents}
-      seo={{ title, description, canonical, hreflang: buildHreflang('/best-historical-cities') }}
+      seo={{
+        title, description, canonical,
+        ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/hu.jpg',
+        ogImageAlt: title,
+        hreflang: buildHreflang('/best-historical-cities'),
+        jsonLd: pageJsonLd({
+          url: canonical, name: title, description, lang,
+          breadcrumbs: [
+            { name: t['home'] ?? 'Home', item: `${BASE_URL}/${lang}` },
+            { name: t['historical_cities'] ?? 'Historical Cities', item: canonical },
+          ],
+        }),
+      }}
       heroImg="hu.jpg"
       heroLabel={t['historical_cities'] ?? 'Historical Cities'}
       breadcrumbKey="historical_cities"

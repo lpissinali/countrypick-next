@@ -60,6 +60,9 @@ export interface PageSEO {
   description: string;
   canonical: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: 'website' | 'article';
+  ogLocale?: string;
   hreflang: HreflangItem[];
   jsonLd?: object;
   additionalJsonLd?: object[];

@@ -65,6 +65,8 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
     description,
     canonical: canonicalUrl,
     ogImage: heroImage,
+    ogImageAlt: `${t['country.text1'] ?? 'Best things to do'} ${country.name}`,
+    ogType: 'article' as const,
     hreflang: buildHreflang(`/${country.identifier}`),
     jsonLd: countryJsonLd({
       name: country.name,
@@ -72,6 +74,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
       lang,
       description,
       alpha2: alpha2Lower,
+      homeLabel: t['home'] ?? 'Home',
     }),
     additionalJsonLd: faqs.length > 0 ? [faqJsonLd(faqs)] : undefined,
   };

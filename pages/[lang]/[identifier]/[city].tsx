@@ -178,6 +178,8 @@ const CityPage: NextPage<Props> = ({
     description,
     canonical: canonicalUrl,
     ogImage: heroImage,
+    ogImageAlt: `${t['city.text1'] ?? 'Best things to do'} ${gem.name}, ${country.name}`,
+    ogType: 'article' as const,
     hreflang: buildHreflang(`/${country.identifier}/${gem.identifier}`),
     jsonLd: cityJsonLd({
       cityName:          gem.name,
@@ -187,6 +189,7 @@ const CityPage: NextPage<Props> = ({
       lang,
       description,
       imageSlug:         gem.imageSlug,
+      homeLabel:         t['home'] ?? 'Home',
     }),
     additionalJsonLd: faqs.length > 0 ? [faqJsonLd(faqs)] : undefined,
   };

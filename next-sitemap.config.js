@@ -3,13 +3,13 @@ const config = {
   siteUrl: 'https://www.countrypick.com',
   generateRobotsTxt: true,
   trailingSlash: false,
-  // Static export: next-sitemap reads the `out/` directory after `next build`
-  outDir: 'out',
+  outDir: 'out',     // next build with output:'export' writes to /out
 
   // Pages we don't want indexed
   exclude: [
-    // The bare root redirect page has no real content
-    '/',
+    '/',            // bare root — no real content, redirects elsewhere
+    '/404',         // error page
+    '**/404',
   ],
 
   robotsTxtOptions: {
@@ -17,44 +17,43 @@ const config = {
       {
         userAgent: '*',
         allow: '/',
-        disallow: [
-          '/api/',
-        ],
+        // No /api/ routes exist (static export), but disallowing is harmless.
+        // Do NOT disallow /_next/ — Google needs those assets to render JS pages.
+        disallow: ['/404'],
       },
     ],
-    additionalSitemaps: [
-      // If you ever split into multiple sitemaps, list extras here
-    ],
+    additionalSitemaps: [],
   },
 
-  // Assign change frequencies and priorities by path pattern
+  // Assign change frequencies and priorities by path pattern.
+  // ORDER MATTERS — more specific patterns must come before broader ones.
   transform: async (config, path) => {
-    // Homepage variants — highest priority
+    // 1. Homepage variants
     if (/^\/(en|pt|es|ru)$/.test(path)) {
       return { loc: path, changefreq: 'weekly', priority: 1.0, lastmod: new Date().toISOString() };
     }
 
-    // Category pages
+    // 2. Category / hub pages
     if (/^\/(en|pt|es|ru)\/(attractions|best-historical-cities|top-natural-places|adventurous-things-to-do)$/.test(path)) {
       return { loc: path, changefreq: 'monthly', priority: 0.8, lastmod: new Date().toISOString() };
     }
 
-    // Country pages
+    // 3. Legal / static pages — check BEFORE the generic country pattern
+    if (/^\/(en|pt|es|ru)\/(faq|terms|privacy|cookies|contact)$/.test(path)) {
+      return { loc: path, changefreq: 'yearly', priority: 0.3, lastmod: '2026-05-30' };
+    }
+
+    // 4. Country pages  e.g. /en/france
     if (/^\/(en|pt|es|ru)\/[^/]+$/.test(path)) {
       return { loc: path, changefreq: 'monthly', priority: 0.7, lastmod: new Date().toISOString() };
     }
 
-    // City pages
+    // 5. City pages  e.g. /en/france/paris
     if (/^\/(en|pt|es|ru)\/[^/]+\/[^/]+$/.test(path)) {
       return { loc: path, changefreq: 'monthly', priority: 0.6, lastmod: new Date().toISOString() };
     }
 
-    // Static/legal pages — lower priority
-    if (/^\/(en|pt|es|ru)\/(faq|terms|privacy|cookies)$/.test(path)) {
-      return { loc: path, changefreq: 'yearly', priority: 0.3, lastmod: '2026-04-25' };
-    }
-
-    // Default
+    // Default fallback
     return { loc: path, changefreq: 'monthly', priority: 0.5, lastmod: new Date().toISOString() };
   },
 };

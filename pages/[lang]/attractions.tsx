@@ -4,7 +4,7 @@ import Layout from '@/components/Layout';
 import { getFooterContinents } from '@/lib/queries';
 import { getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
-import { buildHreflang, BASE_URL } from '@/lib/seo';
+import { buildHreflang, pageJsonLd, BASE_URL } from '@/lib/seo';
 import { type Lang, type FooterContinent } from '@/types';
 
 interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
@@ -128,7 +128,19 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) 
   const title       = t['attractions.title']       ?? 'Top Attractions Around The World | Country Pick';
   const description = t['attractions.description'] ?? 'Discover amazing tours, top things to do and the best attractions around the world.';
 
-  const seo = { title, description, canonical, hreflang: buildHreflang('/attractions') };
+  const ogImage = 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/sub_header_florence_2.jpg';
+  const seo = {
+    title, description, canonical,
+    ogImage, ogImageAlt: title,
+    hreflang: buildHreflang('/attractions'),
+    jsonLd: pageJsonLd({
+      url: canonical, name: title, description, lang,
+      breadcrumbs: [
+        { name: t['home'] ?? 'Home', item: `${BASE_URL}/${lang}` },
+        { name: t['top_attractions'] ?? 'Top Attractions', item: canonical },
+      ],
+    }),
+  };
 
   return (
     <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
