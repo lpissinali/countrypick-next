@@ -46,6 +46,12 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
         isPartOf: { '@id': `${BASE_URL}/#website` },
         publisher: { '@id': `${BASE_URL}/#organization` },
       },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: canonical },
+        ],
+      },
     ],
   };
 

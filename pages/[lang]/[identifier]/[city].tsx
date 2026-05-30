@@ -16,6 +16,8 @@ import { query } from '@/lib/db';
 import { getTranslations } from '@/lib/i18n';
 import { getCityPrep, getCountryPrep } from '@/lib/prepositions';
 import { buildHreflang, cityJsonLd, BASE_URL } from '@/lib/seo';
+import { buildCityFaqs, faqJsonLd } from '@/lib/faqs';
+import type { FAQ } from '@/lib/faqs';
 import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
 
 /** Deterministic seeded shuffle — same seed always yields the same order. */
@@ -128,6 +130,7 @@ interface Props {
   t:           Record<string, string>;
   cityPrep:    string;
   countryPrep: string;
+  faqs:        FAQ[];
   activeLangs: { code: string; name: string }[];
 }
 
@@ -147,7 +150,7 @@ function extractMarkerJson(s: string): string | null {
 }
 
 const CityPage: NextPage<Props> = ({
-  lang, country, gem, things, hotels: hotelsProp, sidebarGems, continents, t, cityPrep, countryPrep, activeLangs,
+  lang, country, gem, things, hotels: hotelsProp, sidebarGems, continents, t, cityPrep, countryPrep, faqs, activeLangs,
 }) => {
   const hotels = hotelsProp ?? [];
   const alpha2Lower  = country.alpha2.toLowerCase();
@@ -173,6 +176,7 @@ const CityPage: NextPage<Props> = ({
       description,
       imageSlug:         gem.imageSlug,
     }),
+    additionalJsonLd: faqs.length > 0 ? [faqJsonLd(faqs)] : undefined,
   };
 
   const hotelsLabel    = `${t['city.text6'] ?? 'Best Places To Stay'}${cityPrep}${gem.name}`;
@@ -305,6 +309,22 @@ const CityPage: NextPage<Props> = ({
                           ))}
                         </ul>
                       </>
+                    )}
+
+                    {/* FAQ section */}
+                    {faqs.length > 0 && (
+                      <div className="faq-section add_bottom_30">
+                        <div className="main_title add_bottom_30">
+                          <h2>{t['country_faq.title'] ?? 'Frequently Asked'} <strong>{t['country_faq.title2'] ?? 'Questions'}</strong></h2>
+                          <span><em /></span>
+                        </div>
+                        {faqs.map((faq, i) => (
+                          <details key={i} className="faq-item">
+                            <summary>{faq.question}</summary>
+                            <p>{faq.answer}</p>
+                          </details>
+                        ))}
+                      </div>
                     )}
 
                     {/* Agoda hotels — pre-fetched at build time */}
@@ -461,6 +481,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const t           = getTranslations(lang);
   const cityPrep    = getCityPrep(gem.name, lang);
   const countryPrep = getCountryPrep(country.alpha2, lang);
+  const faqs        = buildCityFaqs(t, gem.name, country.name, things.map(th => th.title));
 
   return {
     props: {
@@ -475,6 +496,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       t,
       cityPrep,
       countryPrep,
+      faqs,
     },
   };
 };

@@ -7,6 +7,8 @@ import type { GemWithCountry } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { getCountryPrep, getCityPrep } from '@/lib/prepositions';
 import { buildHreflang, countryJsonLd, BASE_URL } from '@/lib/seo';
+import { buildCountryFaqs, faqJsonLd } from '@/lib/faqs';
+import type { FAQ } from '@/lib/faqs';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -29,10 +31,11 @@ interface Props {
   continents: FooterContinent[];
   t: Record<string, string>;
   countryPrep: string;
+  faqs: FAQ[];
   activeLangs: { code: string; name: string }[];
 }
 
-const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, activeLangs }) => {
+const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, faqs, activeLangs }) => {
   const alpha2Lower = country.alpha2.toLowerCase();
   const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}`;
@@ -55,6 +58,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
       description,
       alpha2: alpha2Lower,
     }),
+    additionalJsonLd: faqs.length > 0 ? [faqJsonLd(faqs)] : undefined,
   };
 
   return (
@@ -191,6 +195,22 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                       ))}
                     </div>
                   )}
+                  {/* FAQ section */}
+                  {faqs.length > 0 && (
+                    <div className="faq-section add_bottom_30">
+                      <div className="main_title add_bottom_30">
+                        <h2>{t['country_faq.title'] ?? 'Frequently Asked'} <strong>{t['country_faq.title2'] ?? 'Questions'}</strong></h2>
+                        <span><em /></span>
+                      </div>
+                      {faqs.map((faq, i) => (
+                        <details key={i} className="faq-item">
+                          <summary>{faq.question}</summary>
+                          <p>{faq.answer}</p>
+                        </details>
+                      ))}
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
@@ -286,6 +306,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 
   const t           = getTranslations(lang);
   const countryPrep = getCountryPrep(country.alpha2, lang);
+  const faqs        = buildCountryFaqs(t, country, gems.map(g => g.name));
   const activeLangs = await getActiveLangs();
 
   return {
@@ -298,6 +319,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       continents,
       t,
       countryPrep,
+      faqs,
     },
   };
 };

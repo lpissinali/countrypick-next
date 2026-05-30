@@ -5,7 +5,7 @@ interface SeoProps extends PageSEO {
   lang: string;
 }
 
-export default function Seo({ title, description, canonical, ogImage, hreflang, jsonLd, lang }: SeoProps) {
+export default function Seo({ title, description, canonical, ogImage, hreflang, jsonLd, additionalJsonLd, lang }: SeoProps) {
   return (
     <Head>
       <title>{title}</title>
@@ -39,6 +39,13 @@ export default function Seo({ title, description, canonical, ogImage, hreflang, 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
+      {additionalJsonLd?.map((ld, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      ))}
     </Head>
   );
 }

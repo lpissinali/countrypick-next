@@ -23,3 +23,48 @@
   width: 14px !important;
   height: 14px !important;
 }
+
+/* ── FAQ accordion ─────────────────────────────────────────────────────────── */
+.faq-section .faq-item {
+  border-bottom: 1px solid #e8e8e8;
+  margin-bottom: 0;
+}
+.faq-section .faq-item:first-of-type {
+  border-top: 1px solid #e8e8e8;
+}
+.faq-section .faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 36px 14px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  position: relative;
+  user-select: none;
+}
+.faq-section .faq-item summary::-webkit-details-marker { display: none; }
+.faq-section .faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  font-weight: 300;
+  color: #004dda;
+  line-height: 1;
+}
+.faq-section .faq-item[open] summary::after {
+  content: '\2212';
+}
+.faq-section .faq-item p {
+  margin: 0 0 16px;
+  padding: 0 36px 0 0;
+  color: #555;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.faq-section {
+  padding: 30px 0;
+}

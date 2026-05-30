@@ -62,4 +62,5 @@ export interface PageSEO {
   ogImage?: string;
   hreflang: HreflangItem[];
   jsonLd?: object;
+  additionalJsonLd?: object[];
 }
