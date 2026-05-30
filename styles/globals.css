@@ -411,3 +411,73 @@
   .quiz-section { padding: 60px 0; }
   .quiz-cards { grid-template-columns: 1fr; }
 }
+
+/* ── Nearby destinations ────────────────────────────────────────────────────── */
+.nearby-section {
+  padding: 30px 0;
+}
+.nearby-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+@media (max-width: 600px) {
+  .nearby-grid { grid-template-columns: 1fr; }
+}
+.nearby-card {
+  display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  border: 1px solid #eee;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.nearby-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+.nearby-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  display: block;
+}
+.nearby-card-body {
+  padding: 10px 12px 12px;
+  background: #fff;
+}
+.nearby-card-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+.nearby-card-country {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+.nearby-card-dist {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #004dda;
+  background: rgba(0,77,218,0.08);
+  border-radius: 4px;
+  padding: 2px 7px;
+  margin-right: 6px;
+}
+.nearby-card-trip {
+  display: inline-block;
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+}
+.nearby-far-note {
+  font-size: 13px;
+  color: #777;
+  margin: -10px 0 10px;
+  line-height: 1.5;
+}

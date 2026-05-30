@@ -8,10 +8,21 @@ import {
   getGemByIdentifier,
   getGemWithThings,
   getAllGems,
+  getAllGemCoords,
   getFooterContinents,
   getActiveLangs,
 } from '@/lib/queries';
-import type { GemWithCountry } from '@/lib/queries';
+import type { GemWithCountry, GemCoord, NearbyGem } from '@/lib/queries';
+
+/** Haversine distance in km between two lat/lng points. */
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 import { query } from '@/lib/db';
 import { getTranslations } from '@/lib/i18n';
 import { getCityPrep, getCountryPrep } from '@/lib/prepositions';
@@ -131,6 +142,7 @@ interface Props {
   cityPrep:    string;
   countryPrep: string;
   faqs:        FAQ[];
+  nearbyGems:  NearbyGem[];
   activeLangs: { code: string; name: string }[];
 }
 
@@ -150,7 +162,7 @@ function extractMarkerJson(s: string): string | null {
 }
 
 const CityPage: NextPage<Props> = ({
-  lang, country, gem, things, hotels: hotelsProp, sidebarGems, continents, t, cityPrep, countryPrep, faqs, activeLangs,
+  lang, country, gem, things, hotels: hotelsProp, sidebarGems, continents, t, cityPrep, countryPrep, faqs, nearbyGems, activeLangs,
 }) => {
   const hotels = hotelsProp ?? [];
   const alpha2Lower  = country.alpha2.toLowerCase();
@@ -327,6 +339,73 @@ const CityPage: NextPage<Props> = ({
                       </div>
                     )}
 
+                    {/* Nearby destinations */}
+                    {nearbyGems.length > 0 && (() => {
+                      const minDist = nearbyGems[0]?.distKm ?? null;
+                      const allFar  = minDist != null && minDist > 500;
+                      return (
+                      <div className="nearby-section add_bottom_30">
+                        <div className="main_title add_bottom_30">
+                          <h2>
+                            {allFar
+                              ? (t['city.nearby_title_far'] ?? 'Closest Destinations From')
+                              : (t['city.nearby_title']     ?? 'Things To Do Near')}
+                            {' '}<strong>{gem.name}</strong>
+                          </h2>
+                          {allFar && (
+                            <p className="nearby-far-note">
+                              {t['city.nearby_far_note'] ?? `${gem.name} is one of the world's more remote destinations. These are the closest places worth exploring.`}
+                            </p>
+                          )}
+                          <span><em /></span>
+                        </div>
+                        <div className="nearby-grid">
+                          {nearbyGems.map(g => {
+                            const dist = g.distKm;
+                            const tripKey = dist == null     ? null
+                              : dist < 80                   ? 'city.nearby_day'
+                              : dist < 250                  ? 'city.nearby_weekend'
+                              : dist < 500                  ? 'city.nearby_fewdays'
+                              :                               'city.nearby_extension';
+                            const tripDefault = dist == null     ? ''
+                              : dist < 80                   ? 'Perfect for a day trip'
+                              : dist < 250                  ? 'Great for a weekend trip'
+                              : dist < 500                  ? 'Worth a few days'
+                              :                               'A great extension to your trip';
+                            return (
+                              <Link
+                                key={g.id}
+                                href={`/${lang}/${g.countryIdentifier}/${g.identifier}`}
+                                className="nearby-card"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200,fo-auto/static/img/gems/${g.identifier}.jpg`}
+                                  alt={g.name}
+                                  loading="lazy"
+                                />
+                                <div className="nearby-card-body">
+                                  <span className="nearby-card-name">{g.name}</span>
+                                  <span className="nearby-card-country">{g.countryName}</span>
+                                  {dist != null && (
+                                    <span className="nearby-card-dist">
+                                      {dist.toLocaleString()} km
+                                    </span>
+                                  )}
+                                  {tripKey && (
+                                    <span className="nearby-card-trip">
+                                      {t[tripKey] ?? tripDefault}
+                                    </span>
+                                  )}
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      );
+                    })()}
+
                     {/* Agoda hotels — pre-fetched at build time */}
                     {hotels.length > 0 && (
                       <div>
@@ -464,9 +543,10 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const gem = await getGemByIdentifier(cityIdentifier, identifier, lang);
   if (!gem)  return { notFound: true };
 
-  const [things, allGems, continents, hotels] = await Promise.all([
+  const [things, allGems, gemCoords, continents, hotels] = await Promise.all([
     getGemWithThings(gem.id),
     getAllGems(),
+    getAllGemCoords(),
     getFooterContinents(lang),
     fetchAgodaHotels(gem.cityId, gem.name, country.name),
   ]);
@@ -483,6 +563,26 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const countryPrep = getCountryPrep(country.alpha2, lang);
   const faqs        = buildCityFaqs(t, gem.name, country.name, things.map(th => th.title));
 
+  // Find nearby gems using Haversine distance from this gem's coordinate centre.
+  // Falls back to same-country gems if no coordinate data exists for this gem.
+  const currentCoord = gemCoords.find(g => g.id === gem.id);
+  let nearbyGems: NearbyGem[];
+  if (currentCoord?.lat != null && currentCoord?.lng != null) {
+    nearbyGems = gemCoords
+      .filter(g => g.id !== gem.id && g.lat != null && g.lng != null)
+      .map(g => ({
+        ...g,
+        distKm: Math.round(haversineKm(currentCoord.lat!, currentCoord.lng!, g.lat!, g.lng!)),
+      }))
+      .sort((a, b) => a.distKm! - b.distKm!)
+      .slice(0, 4);
+  } else {
+    nearbyGems = gemCoords
+      .filter(g => g.id !== gem.id && g.countryIdentifier === country.identifier)
+      .slice(0, 4)
+      .map(g => ({ ...g, distKm: null }));
+  }
+
   return {
     props: {
       lang,
@@ -492,6 +592,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       things:      JSON.parse(JSON.stringify(things)),
       hotels,
       sidebarGems: JSON.parse(JSON.stringify(sidebarGems)),
+      nearbyGems:  JSON.parse(JSON.stringify(nearbyGems)),
       continents,
       t,
       cityPrep,

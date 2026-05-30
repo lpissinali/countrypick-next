@@ -200,6 +200,84 @@ export function getAllGems(): Promise<GemWithCountry[]> {
   return _allGemsPromise;
 }
 
+// ─── Gem coordinates (derived from things' Google Places data) ───────────────
+
+export interface GemCoord {
+  id:                number;
+  identifier:        string;
+  name:              string;
+  countryIdentifier: string;
+  countryName:       string;
+  countryAlpha2:     string;
+  lat:               number | null;
+  lng:               number | null;
+}
+
+export interface NearbyGem extends GemCoord {
+  distKm: number | null; // null when falling back to same-country list
+}
+
+/** Strip HTML tags — mirrors extractMarkerJson used on the city page. */
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]*>/g, '').trim();
+}
+
+/**
+ * Returns all gems with approximate centre coordinates derived by averaging
+ * the lat/lng of their Things' additionalInformation (Google Places JSON).
+ * Gems with no usable marker data get lat/lng = null.
+ * Result is cached for the entire build.
+ */
+let _gemCoordsPromise: Promise<GemCoord[]> | null = null;
+
+export function getAllGemCoords(): Promise<GemCoord[]> {
+  if (_gemCoordsPromise) return _gemCoordsPromise;
+
+  _gemCoordsPromise = (async () => {
+    // 1. Fetch all gems (reuse the already-cached call)
+    const gems = await getAllGems();
+
+    // 2. Fetch raw additional_information for every thing that has it
+    type ThingRow = { gemId: number; info: string };
+    const thingRows = await query<ThingRow>(`
+      SELECT gem_id AS gemId, additional_information AS info
+      FROM things
+      WHERE additional_information IS NOT NULL AND additional_information != ''
+    `);
+
+    // 3. Build a map: gemId → [lat, lng][]
+    const coordMap = new Map<number, { lat: number; lng: number }[]>();
+    for (const row of thingRows) {
+      try {
+        const cleaned = stripHtml(row.info);
+        const parsed  = JSON.parse(cleaned);
+        const lat = parsed?.geometry?.location?.lat;
+        const lng = parsed?.geometry?.location?.lng;
+        if (typeof lat === 'number' && typeof lng === 'number') {
+          const arr = coordMap.get(row.gemId) ?? [];
+          arr.push({ lat, lng });
+          coordMap.set(row.gemId, arr);
+        }
+      } catch {
+        // unparseable — skip
+      }
+    }
+
+    // 4. Average coordinates per gem
+    return gems.map(g => {
+      const pts = coordMap.get(g.id);
+      if (!pts || pts.length === 0) {
+        return { ...g, lat: null, lng: null };
+      }
+      const lat = pts.reduce((s, p) => s + p.lat, 0) / pts.length;
+      const lng = pts.reduce((s, p) => s + p.lng, 0) / pts.length;
+      return { ...g, lat, lng };
+    });
+  })();
+
+  return _gemCoordsPromise;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Convert gem name to the slug used in ImageKit paths (mirrors Go logic). */
