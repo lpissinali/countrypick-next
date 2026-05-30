@@ -30,6 +30,7 @@ import { buildHreflang, cityJsonLd, BASE_URL } from '@/lib/seo';
 import { buildCityFaqs, faqJsonLd } from '@/lib/faqs';
 import type { FAQ } from '@/lib/faqs';
 import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 /** Deterministic seeded shuffle — same seed always yields the same order. */
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -591,9 +592,9 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     props: {
       lang,
       country:     JSON.parse(JSON.stringify(country)),
-      gem:         JSON.parse(JSON.stringify(gem)),
+      gem:         JSON.parse(JSON.stringify({ ...gem, description: sanitizeHtml(gem.description) })),
       activeLangs: await getActiveLangs(),
-      things:      JSON.parse(JSON.stringify(things)),
+      things:      JSON.parse(JSON.stringify(things.map(th => ({ ...th, description: sanitizeHtml(th.description) })))),
       hotels,
       sidebarGems: JSON.parse(JSON.stringify(sidebarGems)),
       nearbyGems:  JSON.parse(JSON.stringify(nearbyGems)),

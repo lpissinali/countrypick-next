@@ -12,6 +12,7 @@ import type { FAQ } from '@/lib/faqs';
 import { getSeasonInfo } from '@/lib/season-data';
 import type { SeasonInfo } from '@/lib/season-data';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   let s = 0;
@@ -368,7 +369,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     props: {
       activeLangs,
       lang,
-      country:     JSON.parse(JSON.stringify(country)),
+      country:     JSON.parse(JSON.stringify({ ...country, description: sanitizeHtml(country.description) })),
       gems:        JSON.parse(JSON.stringify(gems)),
       sidebarGems: JSON.parse(JSON.stringify(sidebarGems)),
       continents,
