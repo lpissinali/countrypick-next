@@ -50,7 +50,9 @@ function countryPrepES(alpha2: string): string {
 function cityPrepPT(cityName: string): string {
   const no = new Set(['Rio de Janeiro','Porto','Cairo','Lagos','Recife','Salvador','Havre','Vaticano']);
   const na = new Set(['Cidade do Cabo']);
+  const nas = new Set(['Cataratas do Iguaçu']);
   if (no.has(cityName)) return ' no ';
   if (na.has(cityName)) return ' na ';
+  if (nas.has(cityName)) return ' nas ';
   return ' em ';
 }

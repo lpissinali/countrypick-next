@@ -7,15 +7,30 @@ import {
   getCountryByIdentifier,
   getGemByIdentifier,
   getGemWithThings,
-  getGemsByCountry,
+  getAllGems,
   getFooterContinents,
   getActiveLangs,
 } from '@/lib/queries';
+import type { GemWithCountry } from '@/lib/queries';
 import { query } from '@/lib/db';
 import { getTranslations } from '@/lib/i18n';
 import { getCityPrep, getCountryPrep } from '@/lib/prepositions';
 import { buildHreflang, cityJsonLd, BASE_URL } from '@/lib/seo';
 import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
+
+/** Deterministic seeded shuffle — same seed always yields the same order. */
+function seededShuffle<T>(arr: T[], seed: string): T[] {
+  // Simple hash of the seed string → numeric seed
+  let s = 0;
+  for (let i = 0; i < seed.length; i++) s = (Math.imul(31, s) + seed.charCodeAt(i)) | 0;
+  const rng = () => { s = (Math.imul(1664525, s) + 1013904223) | 0; return (s >>> 0) / 0x100000000; };
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
 
 // ─── Agoda hotel type ─────────────────────────────────────────────────────────
 
@@ -108,7 +123,7 @@ interface Props {
   gem:         Gem;
   things:      Thing[];
   hotels:      AgodaHotel[] | undefined;
-  relatedGems: Gem[];
+  sidebarGems: GemWithCountry[];
   continents:  FooterContinent[];
   t:           Record<string, string>;
   cityPrep:    string;
@@ -132,7 +147,7 @@ function extractMarkerJson(s: string): string | null {
 }
 
 const CityPage: NextPage<Props> = ({
-  lang, country, gem, things, hotels: hotelsProp, relatedGems, continents, t, cityPrep, countryPrep, activeLangs,
+  lang, country, gem, things, hotels: hotelsProp, sidebarGems, continents, t, cityPrep, countryPrep, activeLangs,
 }) => {
   const hotels = hotelsProp ?? [];
   const alpha2Lower  = country.alpha2.toLowerCase();
@@ -361,21 +376,18 @@ const CityPage: NextPage<Props> = ({
 
           {/* ── Sidebar ── */}
           <aside className="col-md-3 theiaStickySidebar" id="sidebar">
-            {relatedGems.length > 0 && (
+            {sidebarGems.length > 0 && (
               <div className="side_box">
                 <div className="main_title">
-                  <h4>
-                    {t['country.text5'] ?? 'Best Things To Do In'}{' '}
-                    <strong>{country.name}</strong>
-                  </h4>
+                  <h4>{t['country.side8'] ?? 'Popular'} <strong>{t['country.side9'] ?? 'Destinations'}</strong></h4>
                   <span><em /></span>
                 </div>
                 <div className="list_tabs">
                   <ul>
-                    {relatedGems.map(g => (
+                    {sidebarGems.map(g => (
                       <li key={g.id}>
                         <div>
-                          <Link href={`/${lang}/${country.identifier}/${g.identifier}`}>
+                          <Link href={`/${lang}/${g.countryIdentifier}/${g.identifier}`}>
                             <figure>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -384,8 +396,8 @@ const CityPage: NextPage<Props> = ({
                                 className="img-rounded"
                               />
                             </figure>
-                            <h3>{t['country.side11'] ?? 'Best Places'} {countryPrep} {g.name}</h3>
-                            <small>{country.name}</small>
+                            <h3>{t['country.side11'] ?? 'Best Places'}{getCityPrep(g.name, lang)}{g.name}</h3>
+                            <small>{g.countryName}</small>
                           </Link>
                         </div>
                       </li>
@@ -434,12 +446,18 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 
   const [things, allGems, continents, hotels] = await Promise.all([
     getGemWithThings(gem.id),
-    getGemsByCountry(country.id),
+    getAllGems(),
     getFooterContinents(lang),
     fetchAgodaHotels(gem.cityId, gem.name, country.name),
   ]);
 
-  const relatedGems = allGems.filter(g => g.id !== gem.id).slice(0, 8);
+  // Exclude the current gem, then pick 8 deterministically using the gem identifier as seed.
+  // Each city page gets a unique but stable set — good for SEO (no duplicate sidebars).
+  const sidebarGems = seededShuffle(
+    allGems.filter(g => g.id !== gem.id),
+    gem.identifier,
+  ).slice(0, 8);
+
   const t           = getTranslations(lang);
   const cityPrep    = getCityPrep(gem.name, lang);
   const countryPrep = getCountryPrep(country.alpha2, lang);
@@ -452,7 +470,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       activeLangs: await getActiveLangs(),
       things:      JSON.parse(JSON.stringify(things)),
       hotels,
-      relatedGems: JSON.parse(JSON.stringify(relatedGems)),
+      sidebarGems: JSON.parse(JSON.stringify(sidebarGems)),
       continents,
       t,
       cityPrep,

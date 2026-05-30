@@ -2,23 +2,37 @@ import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { query } from '@/lib/db';
-import { getAllCountryPaths, getCountryByIdentifier, getGemsWithThingsByCountry, getFooterContinents , getActiveLangs } from '@/lib/queries';
+import { getAllCountryPaths, getCountryByIdentifier, getGemsWithThingsByCountry, getAllGems, getFooterContinents, getActiveLangs } from '@/lib/queries';
+import type { GemWithCountry } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { getCountryPrep, getCityPrep } from '@/lib/prepositions';
 import { buildHreflang, countryJsonLd, BASE_URL } from '@/lib/seo';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 
+function seededShuffle<T>(arr: T[], seed: string): T[] {
+  let s = 0;
+  for (let i = 0; i < seed.length; i++) s = (Math.imul(31, s) + seed.charCodeAt(i)) | 0;
+  const rng = () => { s = (Math.imul(1664525, s) + 1013904223) | 0; return (s >>> 0) / 0x100000000; };
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 interface Props {
   lang: Lang;
   country: Country;
   gems: GemWithThings[];
+  sidebarGems: GemWithCountry[];
   continents: FooterContinent[];
   t: Record<string, string>;
   countryPrep: string;
   activeLangs: { code: string; name: string }[];
 }
 
-const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, countryPrep, activeLangs }) => {
+const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, activeLangs }) => {
   const alpha2Lower = country.alpha2.toLowerCase();
   const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}`;
@@ -164,10 +178,10 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
                                   loading="lazy"
                                   src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`}
                                   className="img-responsive"
-                                  alt={`${t['country.text5'] ?? 'Best Things To Do In'} ${gem.name}`}
+                                  alt={`${t['country.text5'] ?? 'Best Things To Do In'}${getCityPrep(gem.name, lang)}${gem.name}`}
                                 />
                                 <div className="short_info">
-                                  <h3>{t['country.text5'] ?? 'Best Things To Do In'} {gem.name}</h3>
+                                  <h3>{t['country.text5'] ?? 'Best Things To Do In'}{getCityPrep(gem.name, lang)}{gem.name}</h3>
                                   <em>{country.name}</em>
                                 </div>
                               </Link>
@@ -195,32 +209,28 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, continents, t, coun
 
           {/* ── Sidebar ── */}
           <aside className="col-md-3 theiaStickySidebar" id="sidebar">
-            {/* Top cities in this country */}
-            {gems.length > 0 && (
+            {sidebarGems.length > 0 && (
               <div className="side_box">
                 <div className="main_title">
-                  <h4>
-                    {t['country.text5'] ?? 'Best Things To Do In'}{' '}
-                    <strong>{country.name}</strong>
-                  </h4>
+                  <h4>{t['country.side8'] ?? 'Popular'} <strong>{t['country.side9'] ?? 'Destinations'}</strong></h4>
                   <span><em /></span>
                 </div>
                 <div className="list_tabs">
                   <ul>
-                    {gems.slice(0, 8).map(gem => (
-                      <li key={gem.id}>
+                    {sidebarGems.map(g => (
+                      <li key={g.id}>
                         <div>
-                          <Link href={`/${lang}/${country.identifier}/${gem.identifier}`}>
+                          <Link href={`/${lang}/${g.countryIdentifier}/${g.identifier}`}>
                             <figure>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${gem.identifier}.jpg`}
-                                alt={gem.name}
+                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg`}
+                                alt={g.name}
                                 className="img-rounded"
                               />
                             </figure>
-                            <h3>{gem.things.length > 0 ? gem.things.length : ''} {t['country.side11'] ?? 'Best Places'}{getCityPrep(gem.name, lang)}{gem.name}</h3>
-                            <small>{country.name}</small>
+                            <h3>{t['country.side11'] ?? 'Best Places'}{getCityPrep(g.name, lang)}{g.name}</h3>
+                            <small>{g.countryName}</small>
                           </Link>
                         </div>
                       </li>
@@ -263,10 +273,16 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const country = await getCountryByIdentifier(identifier, lang);
   if (!country) return { notFound: true };
 
-  const [gems, continents] = await Promise.all([
+  const [gems, allGems, continents] = await Promise.all([
     getGemsWithThingsByCountry(country.id),
+    getAllGems(),
     getFooterContinents(lang),
   ]);
+
+  const sidebarGems = seededShuffle(
+    allGems.filter(g => g.countryIdentifier !== country.identifier),
+    country.identifier,
+  ).slice(0, 8);
 
   const t           = getTranslations(lang);
   const countryPrep = getCountryPrep(country.alpha2, lang);
@@ -276,8 +292,9 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     props: {
       activeLangs,
       lang,
-      country: JSON.parse(JSON.stringify(country)),
-      gems:    JSON.parse(JSON.stringify(gems)),
+      country:     JSON.parse(JSON.stringify(country)),
+      gems:        JSON.parse(JSON.stringify(gems)),
+      sidebarGems: JSON.parse(JSON.stringify(sidebarGems)),
       continents,
       t,
       countryPrep,

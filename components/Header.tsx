@@ -47,8 +47,10 @@ export default function Header({ lang, t, activeLangs }: HeaderProps) {
     return '/' + parts.join('/');
   }
 
+  const isHome = router.asPath === `/${lang}` || router.asPath === `/${lang}/`;
+
   return (
-    <header suppressHydrationWarning>
+    <header className={isHome ? 'sticky' : undefined} suppressHydrationWarning>
       <div className="container-fluid">
         <div className="row">
           <div className="col--md-4 col-sm-3 col-xs-4">

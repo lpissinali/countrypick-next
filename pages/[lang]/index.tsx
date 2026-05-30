@@ -326,15 +326,15 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
           <div className="row">
             <div className="col-md-8">
               <div className="img_wrapper_grid">
-                <div className="ribbon"><span>{t['{popular}'] ?? 'Popular'}</span></div>
+                <div className="ribbon"><span>{t['popular'] ?? 'Popular'}</span></div>
                 <div className="img_container_grid">
                   <Link href={`/${lang}/${FEATURED_ROW1_BIG.href}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${FEATURED_ROW1_BIG.img}.jpg`} className="img-responsive" alt={FEATURED_ROW1_BIG.alt} loading="eager" />
                     <div className="short_info_grid">
-                      <h3>{t['{usa}'] ?? FEATURED_ROW1_BIG.label}</h3>
+                      <h3>{t['usa'] ?? FEATURED_ROW1_BIG.label}</h3>
                       <em>{FEATURED_ROW1_BIG.sub}</em>
-                      <p>{t['{read_more}'] ?? 'Read More'}</p>
+                      <p>{t['read_more'] ?? 'Read More'}</p>
                     </div>
                   </Link>
                 </div>
@@ -343,7 +343,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
             <div className="col-md-4">
               {FEATURED_ROW1_STACK.map(f => (
                 <div key={f.href} className="img_wrapper_grid">
-                  <div className="ribbon"><span>{t['{popular}'] ?? 'Popular'}</span></div>
+                  <div className="ribbon"><span>{t['popular'] ?? 'Popular'}</span></div>
                   <div className="img_container_grid">
                     <Link href={`/${lang}/${f.href}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -351,7 +351,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
                       <div className="short_info_grid">
                         <h3>{f.label}</h3>
                         <em>{f.sub}</em>
-                        <p>{t['{read_more}'] ?? 'Read More'}</p>
+                        <p>{t['read_more'] ?? 'Read More'}</p>
                       </div>
                     </Link>
                   </div>
@@ -365,7 +365,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
             {FEATURED_ROW2.map(f => (
               <div key={f.href} className="col-md-4">
                 <div className="img_wrapper_grid">
-                  <div className="ribbon top"><span>{t['{top_rated}'] ?? 'Top Rated'}</span></div>
+                  <div className="ribbon top"><span>{t['top_rated'] ?? 'Top Rated'}</span></div>
                   <div className="img_container_grid">
                     <Link href={`/${lang}/${f.href}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -373,7 +373,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
                       <div className="short_info_grid">
                         <h3>{f.label}</h3>
                         <em>{f.sub}</em>
-                        <p>{t['{read_more}'] ?? 'Read More'}</p>
+                        <p>{t['read_more'] ?? 'Read More'}</p>
                       </div>
                     </Link>
                   </div>
@@ -388,16 +388,16 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
       <section className="bg_blue explore-section">
         <div className="container">
           <div className="main_title">
-            <h2>{t['{explore}'] ?? 'Explore'} <strong>{t['{the_world}'] ?? 'the World'}</strong></h2>
-            <p>{t['{explore_subtitle}'] ?? 'Discover top attractions, historic cities, natural wonders and adventure destinations.'}</p>
+            <h3>{t['explore'] ?? 'Explore'} <strong>{t['the_world'] ?? 'the World'}</strong></h3>
+            <p>{t['explore_subtitle'] ?? 'Discover top attractions, historic cities, natural wonders and adventure destinations.'}</p>
             <span><em /></span>
           </div>
           <div className="row explore-cards">
             {[
-              { num: '01', href: `/${lang}/attractions`,              label: t['{top_attractions}']  ?? 'Top Attractions',    desc: t['{explore_attractions_desc}'] ?? '', cta: t['{cta_attractions}']  ?? 'Browse attractions'      },
-              { num: '02', href: `/${lang}/best-historical-cities`,   label: t['{historical_cities}'] ?? 'Historical Cities',  desc: t['{explore_historical_desc}']  ?? '', cta: t['{cta_historical}']   ?? 'Browse historical cities' },
-              { num: '03', href: `/${lang}/top-natural-places`,       label: t['{natural_places}']   ?? 'Natural Places',      desc: t['{explore_natural_desc}']     ?? '', cta: t['{cta_natural}']      ?? 'Discover natural places'  },
-              { num: '04', href: `/${lang}/adventurous-things-to-do`, label: t['{adventure_travel}'] ?? 'Adventure Travel',    desc: t['{explore_adventure_desc}']   ?? '', cta: t['{cta_adventure}']    ?? 'Find adventures'          },
+              { num: '01', href: `/${lang}/attractions`,              label: t['top_attractions']   ?? 'Top Attractions',    desc: t['explore_attractions_desc'] ?? '', cta: t['cta_attractions']  ?? 'Browse attractions'      },
+              { num: '02', href: `/${lang}/best-historical-cities`,   label: t['historical_cities'] ?? 'Historical Cities',  desc: t['explore_historical_desc']  ?? '', cta: t['cta_historical']   ?? 'Browse historical cities' },
+              { num: '03', href: `/${lang}/top-natural-places`,       label: t['natural_places']    ?? 'Natural Places',     desc: t['explore_natural_desc']     ?? '', cta: t['cta_natural']      ?? 'Discover natural places'  },
+              { num: '04', href: `/${lang}/adventurous-things-to-do`, label: t['adventure_travel']  ?? 'Adventure Travel',   desc: t['explore_adventure_desc']   ?? '', cta: t['cta_adventure']    ?? 'Find adventures'          },
             ].map(cat => (
               <div key={cat.href} className="col-md-3 col-sm-6">
                 <Link href={cat.href} className="explore-card">

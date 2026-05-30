@@ -165,6 +165,41 @@ export async function getFooterContinents(lang: Lang): Promise<FooterContinent[]
   return Array.from(map.values());
 }
 
+// ─── Global gems (cross-country) ─────────────────────────────────────────────
+
+/** Gem with its country identifier and name — used for cross-country sidebar. */
+export interface GemWithCountry extends Gem {
+  countryIdentifier: string;
+  countryName:       string;
+  countryAlpha2:     string;
+}
+
+/**
+ * Fetch all gems across every country (build-time only).
+ * Result is cached in module memory so the DB is only queried once per build,
+ * regardless of how many city pages are generated in parallel.
+ */
+let _allGemsPromise: Promise<GemWithCountry[]> | null = null;
+
+export function getAllGems(): Promise<GemWithCountry[]> {
+  if (_allGemsPromise) return _allGemsPromise;
+  _allGemsPromise = query<GemWithCountry>(`
+    SELECT
+      g.id,
+      g.identifier,
+      g.gems_name        AS name,
+      g.gems_description AS description,
+      g.city_id          AS cityId,
+      c.identifier       AS countryIdentifier,
+      c.countryName      AS countryName,
+      c.alpha2           AS countryAlpha2
+    FROM gems g
+    JOIN loccountries c ON c.id = g.country_id
+    WHERE c.status = 1 AND c.language_name = 'EN'
+  `).then(rows => rows.map(g => ({ ...g, imageSlug: toImageSlug(g.name) })));
+  return _allGemsPromise;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Convert gem name to the slug used in ImageKit paths (mirrors Go logic). */

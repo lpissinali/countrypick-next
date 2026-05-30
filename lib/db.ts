@@ -14,7 +14,7 @@ export function getPool(): mysql.Pool {
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_DATABASE || 'countrypick',
       waitForConnections: true,
-      connectionLimit: 20,
+      connectionLimit: 5,
       queueLimit: 0,
       connectTimeout: 60000,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
