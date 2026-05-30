@@ -3,7 +3,7 @@ import StaticPage from '@/components/StaticPage';
 import { getFooterContinents , getActiveLangs } from '@/lib/queries';
 import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL } from '@/lib/seo';
-import { LANGS, type Lang, type FooterContinent } from '@/types';
+import { type Lang, type FooterContinent } from '@/types';
 
 interface Props { lang: Lang; t: Record<string, string>; continents: FooterContinent[]; activeLangs: { code: string; name: string }[];
 }
@@ -17,7 +17,7 @@ const FaqPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
     title,
     description,
     canonical,
-    hreflang: buildHreflang('/faq'),
+    hreflang: buildHreflang('/faq', activeLangs),
   };
 
   return (
@@ -171,6 +171,5 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
     const activeLangs = await getActiveLangs();
-  return { props: { activeLangs,
-      lang, t: getTranslations(lang), continents } };
+  return { props: { activeLangs, lang, t: getTranslations(lang), continents } };
 };

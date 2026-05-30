@@ -226,7 +226,7 @@ const CookiesPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
     title: c.title,
     description: c.description,
     canonical,
-    hreflang: buildHreflang('/cookies'),
+    hreflang: buildHreflang('/cookies', activeLangs),
     jsonLd: pageJsonLd({
       url: canonical, name: c.title, description: c.description, lang,
       breadcrumbs: [

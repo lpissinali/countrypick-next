@@ -172,7 +172,7 @@ const PrivacyPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
     title: c.title,
     description: c.description,
     canonical,
-    hreflang: buildHreflang('/privacy'),
+    hreflang: buildHreflang('/privacy', activeLangs),
     jsonLd: pageJsonLd({
       url: canonical, name: c.title, description: c.description, lang,
       breadcrumbs: [

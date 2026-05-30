@@ -2,14 +2,21 @@
  * SEO helpers — build canonical URLs, hreflang sets, and JSON-LD objects.
  */
 import type { Lang, HreflangItem, PageSEO } from '@/types';
-import { LANGS } from '@/types';
 
 export const BASE_URL = 'https://www.countrypick.com';
 
-export function buildHreflang(path: string): HreflangItem[] {
+/**
+ * Build hreflang entries from the active languages fetched at build time.
+ * Pass activeLangs from getStaticProps so disabled languages are excluded.
+ */
+export function buildHreflang(
+  path: string,
+  activeLangs?: { code: string }[],
+): HreflangItem[] {
+  const langs = activeLangs?.map(l => l.code) ?? ['en', 'pt', 'es'];
   return [
     { hreflang: 'x-default', href: `${BASE_URL}/en${path}` },
-    ...LANGS.map(lang => ({ hreflang: lang, href: `${BASE_URL}/${lang}${path}` })),
+    ...langs.map(lang => ({ hreflang: lang, href: `${BASE_URL}/${lang}${path}` })),
   ];
 }
 

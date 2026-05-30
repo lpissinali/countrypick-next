@@ -66,7 +66,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
     canonical,
     ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-1200,h-630,f-auto/static/img/it.jpg',
     ogImageAlt: title,
-    hreflang: buildHreflang(''),
+    hreflang: buildHreflang('', activeLangs),
     jsonLd,
   };
 
@@ -446,7 +446,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const t = getTranslations(lang);
   const activeLangs = await getActiveLangs();
 
-  // Build the quiz country list: only countries that have both tags and season data
   const quizCountries: QuizCountry[] = allCountries
     .filter(c => COUNTRY_TAGS[c.alpha2])
     .map(c => {

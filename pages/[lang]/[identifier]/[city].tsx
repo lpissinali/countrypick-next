@@ -31,6 +31,7 @@ import { buildCityFaqs, faqJsonLd } from '@/lib/faqs';
 import type { FAQ } from '@/lib/faqs';
 import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
 import { sanitizeHtml } from '@/lib/sanitize';
+import AdSense from '@/components/AdSense';
 
 /** Deterministic seeded shuffle — same seed always yields the same order. */
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -181,7 +182,7 @@ const CityPage: NextPage<Props> = ({
     ogImage: heroImage,
     ogImageAlt: `${t['city.text1'] ?? 'Best things to do'} ${gem.name}, ${country.name}`,
     ogType: 'article' as const,
-    hreflang: buildHreflang(`/${country.identifier}/${gem.identifier}`),
+    hreflang: buildHreflang(`/${country.identifier}/${gem.identifier}`, activeLangs),
     jsonLd: cityJsonLd({
       cityName:          gem.name,
       countryName:       country.name,
@@ -276,15 +277,7 @@ const CityPage: NextPage<Props> = ({
                     )}
 
                     {/* AdSense */}
-                    <ins
-                      className="adsbygoogle"
-                      style={{ display: 'block' }}
-                      data-ad-client="ca-pub-4831931651277615"
-                      data-ad-slot="5242394336"
-                      data-ad-format="auto"
-                      data-full-width-responsive="true"
-                    />
-                    <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+                    <AdSense slot="5242394336" />
 
                     {/* Things to do — timeline + map */}
                     {things.length > 0 && (
@@ -466,15 +459,7 @@ const CityPage: NextPage<Props> = ({
             </div>
 
             {/* AdSense bottom */}
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-4831931651277615"
-              data-ad-slot="5242394336"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+            <AdSense slot="5242394336" />
           </div>
 
           {/* ── Sidebar ── */}
@@ -511,15 +496,7 @@ const CityPage: NextPage<Props> = ({
             )}
 
             {/* AdSense sidebar */}
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-4831931651277615"
-              data-ad-slot="5242394336"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+            <AdSense slot="5242394336" />
           </aside>
         </div>
       </div>
@@ -555,8 +532,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     fetchAgodaHotels(gem.cityId, gem.name, country.name),
   ]);
 
-  // Exclude the current gem, then pick 8 deterministically using the gem identifier as seed.
-  // Each city page gets a unique but stable set — good for SEO (no duplicate sidebars).
   const sidebarGems = seededShuffle(
     allGems.filter(g => g.identifier !== gem.identifier),
     gem.identifier,
@@ -567,9 +542,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const countryPrep = getCountryPrep(country.alpha2, lang);
   const faqs        = buildCityFaqs(t, gem.name, country.name, things.map(th => th.title));
 
-  // Find nearby gems using Haversine distance from this gem's coordinate centre.
-  // Falls back to same-country gems if no coordinate data exists for this gem.
-  // Match by identifier (not id) — gemCoords is EN-only so ids differ across languages.
   const currentCoord = gemCoords.find(g => g.identifier === gem.identifier);
   let nearbyGems: NearbyGem[];
   if (currentCoord?.lat != null && currentCoord?.lng != null) {

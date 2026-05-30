@@ -132,7 +132,7 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) 
   const seo = {
     title, description, canonical,
     ogImage, ogImageAlt: title,
-    hreflang: buildHreflang('/attractions'),
+    hreflang: buildHreflang('/attractions', activeLangs),
     jsonLd: pageJsonLd({
       url: canonical, name: title, description, lang,
       breadcrumbs: [

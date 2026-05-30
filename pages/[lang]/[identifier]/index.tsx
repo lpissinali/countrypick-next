@@ -13,6 +13,7 @@ import { getSeasonInfo } from '@/lib/season-data';
 import type { SeasonInfo } from '@/lib/season-data';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 import { sanitizeHtml } from '@/lib/sanitize';
+import AdSense from '@/components/AdSense';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   let s = 0;
@@ -68,7 +69,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
     ogImage: heroImage,
     ogImageAlt: `${t['country.text1'] ?? 'Best things to do'} ${country.name}`,
     ogType: 'article' as const,
-    hreflang: buildHreflang(`/${country.identifier}`),
+    hreflang: buildHreflang(`/${country.identifier}`, activeLangs),
     jsonLd: countryJsonLd({
       name: country.name,
       identifier: country.identifier,
@@ -176,15 +177,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                   {/* AdSense */}
                   <div className="row">
                     <div className="col-xs-12 add_bottom_30">
-                      <ins
-                        className="adsbygoogle"
-                        style={{ display: 'block' }}
-                        data-ad-client="ca-pub-4831931651277615"
-                        data-ad-slot="5242394336"
-                        data-ad-format="auto"
-                        data-full-width-responsive="true"
-                      />
-                      <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+                      <AdSense slot="5242394336" />
                     </div>
                   </div>
 
@@ -254,7 +247,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                   {faqs.length > 0 && (
                     <div className="faq-section add_bottom_30">
                       <div className="main_title add_bottom_30">
-                        <h2>{t['country_faq.title'] ?? 'Frequently Asked'} <strong>{t['country_faq.title2'] ?? 'Questions'}</strong></h2>
+                                                <h2>{t['country_faq.title'] ?? 'Frequently Asked'} <strong>{t['country_faq.title2'] ?? 'Questions'}</strong></h2>
                         <span><em /></span>
                       </div>
                       {faqs.map((faq, i) => (
@@ -271,15 +264,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
             </div>
 
             {/* AdSense bottom */}
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-4831931651277615"
-              data-ad-slot="5242394336"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+            <AdSense slot="5242394336" />
           </div>
 
           {/* ── Sidebar ── */}
@@ -316,15 +301,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
             )}
 
             {/* AdSense sidebar */}
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-4831931651277615"
-              data-ad-slot="5242394336"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-            <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+            <AdSense slot="5242394336" />
           </aside>
         </div>
       </div>

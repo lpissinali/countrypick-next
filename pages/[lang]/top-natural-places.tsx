@@ -35,7 +35,7 @@ const NaturalPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
         title, description, canonical,
         ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/no.jpg',
         ogImageAlt: title,
-        hreflang: buildHreflang('/top-natural-places'),
+        hreflang: buildHreflang('/top-natural-places', activeLangs),
         jsonLd: pageJsonLd({
           url: canonical, name: title, description, lang,
           breadcrumbs: [
@@ -68,7 +68,6 @@ export const getStaticPaths: GetStaticPaths = async () => ({
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const lang = (params?.lang as Lang) ?? 'en';
   const continents = await getFooterContinents(lang);
-    const activeLangs = await getActiveLangs();
-  return { props: { activeLangs,
-      lang, t: getTranslations(lang), continents } };
+  const activeLangs = await getActiveLangs();
+  return { props: { activeLangs, lang, t: getTranslations(lang), continents } };
 };

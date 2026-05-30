@@ -133,8 +133,6 @@ const C = {
   },
 } as const;
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 const TermsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
   const canonical = `${BASE_URL}/${lang}/terms`;
   const c = C[lang as keyof typeof C] ?? C.en;
@@ -143,7 +141,7 @@ const TermsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) => {
     title: c.title,
     description: c.description,
     canonical,
-    hreflang: buildHreflang('/terms'),
+    hreflang: buildHreflang('/terms', activeLangs),
     jsonLd: pageJsonLd({
       url: canonical, name: c.title, description: c.description, lang,
       breadcrumbs: [
