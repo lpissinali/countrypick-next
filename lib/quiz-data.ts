@@ -39,7 +39,6 @@ export const COUNTRY_TAGS: Record<string, TripType[]> = {
   MK: ['history', 'nature'],
   BA: ['culture', 'history', 'nature'],
   SI: ['nature', 'adventure', 'culture'],
-  HR: ['beach', 'history'],
   SK: ['history', 'nature', 'adventure'],
   NO: ['nature', 'adventure'],
   SE: ['nature', 'culture'],
