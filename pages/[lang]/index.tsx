@@ -10,6 +10,7 @@ import { getTranslations } from '@/lib/i18n';
 import { buildHreflang, BASE_URL, WEBSITE_LD, ORG_LD } from '@/lib/seo';
 import { type Lang, type FooterContinent } from '@/types';
 import CountryQuiz from '@/components/CountryQuiz';
+import AdSense from '@/components/AdSense';
 import { COUNTRY_TAGS } from '@/lib/quiz-data';
 import type { QuizCountry } from '@/lib/quiz-data';
 import { getSeasonInfo } from '@/lib/season-data';
@@ -260,6 +261,11 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
       {/* ── Countries You Might Like Quiz ── */}
       <CountryQuiz lang={lang} t={t} countries={quizCountries} />
 
+      {/* ── Ad: below map/quiz ── */}
+      <div className="container" style={{ marginBottom: 30 }}>
+        <AdSense slot="2651930679" />
+      </div>
+
       {/* ── "Discover Unique Tours" section ── */}
       <section className="bg_white margin_60_30">
         <div className="container">
@@ -416,6 +422,11 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
             ))}
           </div>
         </div>
+      </div>
+
+      {/* ── Ad: between Featured Destinations and Explore ── */}
+      <div className="container" style={{ marginBottom: 30 }}>
+        <AdSense slot="2651930679" />
       </div>
 
       {/* ── Explore the World ── */}

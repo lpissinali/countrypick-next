@@ -207,6 +207,13 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                       ))}
                     </div>
                   )}
+                  {/* Ad: after gems grid */}
+                  <div className="row">
+                    <div className="col-xs-12 add_bottom_30">
+                      <AdSense slot="2651930679" />
+                    </div>
+                  </div>
+
                   {/* Best time to visit */}
                   {season && (
                     <div className="season-section add_bottom_30">
@@ -258,6 +265,13 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                       ))}
                     </div>
                   )}
+
+                  {/* Ad: after FAQs */}
+                  <div className="row">
+                    <div className="col-xs-12 add_bottom_30">
+                      <AdSense slot="2651930679" />
+                    </div>
+                  </div>
 
                 </div>
               </div>

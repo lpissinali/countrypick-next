@@ -19,6 +19,18 @@ export default function App({ Component, pageProps }: AppProps) {
     script.async = true;
     script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4831931651277615';
     script.crossOrigin = 'anonymous';
+    // Disable top anchor/overlay ads — they inject before <header> outside React's tree
+    script.onload = () => {
+      try {
+        (window as any).adsbygoogle = (window as any).adsbygoogle || [];
+        (window as any).adsbygoogle.push({
+          google_ad_client: 'ca-pub-4831931651277615',
+          overlays: { bottom: true },  // allow bottom anchor only, not top
+        });
+      } catch {
+        // Ignore — happens in StrictMode (double-invoke) or if AdSense already initialized
+      }
+    };
     document.head.appendChild(script);
   }, []);
 

@@ -336,6 +336,9 @@ const CityPage: NextPage<Props> = ({
                       </div>
                     )}
 
+                    {/* Ad: after FAQs */}
+                    <AdSense slot="2651930679" />
+
                     {/* Nearby destinations */}
                     {nearbyGems.length > 0 && (() => {
                       const minDist = nearbyGems[0]?.distKm ?? null;
@@ -402,6 +405,9 @@ const CityPage: NextPage<Props> = ({
                       </div>
                       );
                     })()}
+
+                    {/* Ad: after nearby destinations */}
+                    <AdSense slot="2651930679" />
 
                     {/* Agoda hotels — pre-fetched at build time */}
                     {hotels.length > 0 && (
