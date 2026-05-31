@@ -14,6 +14,7 @@ import type { SeasonInfo } from '@/lib/season-data';
 import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 import { sanitizeHtml } from '@/lib/sanitize';
 import AdSense from '@/components/AdSense';
+import GemImage from '@/components/GemImage';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   let s = 0;
@@ -189,10 +190,9 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                           <div className="img_wrapper">
                             <div className="img_container">
                               <Link href={`/${lang}/${country.identifier}/${gem.identifier}`}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  loading="lazy"
+                                <GemImage
                                   src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`}
+                                  fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`}
                                   className="img-responsive"
                                   alt={`${t['country.text5'] ?? 'Best Things To Do In'}${getCityPrep(gem.name, lang)}${gem.name}`}
                                 />

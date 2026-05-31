@@ -189,7 +189,7 @@ export default function CountryQuiz({ lang, t, countries }: CountryQuizProps) {
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-400,h-280,fo-auto/static/img/gallery/${c.alpha2.toLowerCase()}.jpg`}
+                        src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-400,h-280/static/img/gallery/${c.alpha2.toLowerCase()}.jpg`}
                         alt={c.name}
                         loading="lazy"
                       />

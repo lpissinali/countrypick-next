@@ -28,12 +28,12 @@ class MyDocument extends Document<{ lang: string }> {
             gtag('set', 'url_passthrough', true);
           `}} />
           {/* Google Analytics */}
-          <script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE55NGFRF" />
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD3ZB6065B" />
           <script dangerouslySetInnerHTML={{ __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-5PE55NGFRF', { anonymize_ip: true });
+            gtag('config', 'G-BD3ZB6065B', { anonymize_ip: true });
           `}} />
           {/* Google AdSense */}
           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4831931651277615" crossOrigin="anonymous" />

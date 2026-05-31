@@ -32,6 +32,7 @@ import type { FAQ } from '@/lib/faqs';
 import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
 import { sanitizeHtml } from '@/lib/sanitize';
 import AdSense from '@/components/AdSense';
+import GemImage from '@/components/GemImage';
 
 /** Deterministic seeded shuffle — same seed always yields the same order. */
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -262,10 +263,9 @@ const CityPage: NextPage<Props> = ({
                   <div className="city-block">
                     {/* City hero image */}
                     <p>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        loading="lazy"
+                      <GemImage
                         src={gemImage}
+                        fallback={heroImage}
                         className="img-responsive"
                         alt={`${t['city.text5'] ?? 'Best things to do'}${cityPrep}${gem.name} - ${country.name}`}
                       />
@@ -375,9 +375,9 @@ const CityPage: NextPage<Props> = ({
                                 href={`/${lang}/${g.countryIdentifier}/${g.identifier}`}
                                 className="nearby-card"
                               >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200,fo-auto/static/img/gems/${g.identifier}.jpg`}
+                                <GemImage
+                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200/static/img/gems/${g.identifier}.jpg`}
+                                  fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200/static/img/gallery/${g.countryAlpha2.toLowerCase()}.jpg`}
                                   alt={g.name}
                                   loading="lazy"
                                 />
@@ -477,9 +477,9 @@ const CityPage: NextPage<Props> = ({
                         <div>
                           <Link href={`/${lang}/${g.countryIdentifier}/${g.identifier}`}>
                             <figure>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
+                              <GemImage
                                 src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg`}
+                                fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gallery/${g.countryAlpha2.toLowerCase()}.jpg`}
                                 alt={g.name}
                                 className="img-rounded"
                               />
