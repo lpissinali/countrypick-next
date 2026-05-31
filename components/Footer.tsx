@@ -30,7 +30,7 @@ export default function Footer({ lang, t, continents, hideExplore }: FooterProps
                   <ul>
                     {continent.countries.map(country => (
                       <li key={country.identifier}>
-                        <Link href={`/${lang}/${country.identifier}`}>
+                        <Link href={`/${lang}/${country.identifier}`} prefetch={false}>
                           {country.name}
                         </Link>
                       </li>

@@ -5,7 +5,6 @@
  * "No slot size for availableWidth=0" error that occurs when push() runs during
  * HTML parsing before the container has its final dimensions.
  */
-'use client';
 import { useEffect, useRef } from 'react';
 
 interface AdSenseProps {
