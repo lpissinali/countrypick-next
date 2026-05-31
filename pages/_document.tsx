@@ -1,9 +1,9 @@
 import Document, { Html, Head, Main, NextScript, DocumentContext, DocumentInitialProps } from 'next/document';
+import { STATIC_V } from '@/lib/static-version';
 
 class MyDocument extends Document<{ lang: string }> {
   static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps & { lang: string }> {
     const initialProps = await Document.getInitialProps(ctx);
-    // ctx.query.lang is the [lang] segment for all pages under /[lang]/...
     const lang = (ctx.query?.lang as string) || 'en';
     return { ...initialProps, lang };
   }
@@ -13,7 +13,7 @@ class MyDocument extends Document<{ lang: string }> {
     return (
       <Html lang={lang}>
         <Head>
-          {/* Google Consent Mode v2 — defaults denied until user accepts */}
+          {/* Google Consent Mode v2 — must run before GA/AdSense initialize */}
           <script dangerouslySetInnerHTML={{ __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -25,27 +25,20 @@ class MyDocument extends Document<{ lang: string }> {
               wait_for_update:    500,
               region:             []
             });
-            // Suppress Google's own Funding Choices dialog — we handle consent ourselves
             gtag('set', 'no_new_user_default', true);
             gtag('set', 'ads_data_redaction', true);
             gtag('set', 'url_passthrough', true);
           `}} />
-          {/* Google Analytics */}
-          <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD3ZB6065B" />
-          <script dangerouslySetInnerHTML={{ __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-5PE55NGFRF', { anonymize_ip: true });
-          `}} />
-          {/* Google AdSense */}
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4831931651277615" crossOrigin="anonymous" />
+          {/* GA + AdSense loaded via Next.js Script in _app.tsx for better perf */}
           <meta name="google-adsense-account" content="ca-pub-4831931651277615" />
           {/* Resource hints */}
-          <link rel="dns-prefetch" href="https://ik.imagekit.io" />
-          <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
-          <link rel="dns-prefetch" href="https://maps.googleapis.com" />
-          {/* Favicons — self-hosted */}
+          <link rel="preconnect" href="https://ik.imagekit.io" crossOrigin="anonymous" />
+          <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+          <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+          {/* Preload icomoon font to break CSS→font discovery chain */}
+          <link rel="preload" as="font" type="font/ttf"
+            href="/static/css/fonts/icomoon.ttf?82joyg" crossOrigin="anonymous" />
+          {/* Favicons */}
           <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
           <link rel="apple-touch-icon" sizes="144x144" href="/static/img/apple-touch-icon.png" />
           <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png" />
@@ -56,8 +49,8 @@ class MyDocument extends Document<{ lang: string }> {
           <meta name="twitter:site" content="@countrypick" />
           <meta name="twitter:creator" content="@countrypick" />
           <meta name="keywords" content="travel, tours, things to do, attractions, interactive map, country, trip, hidden gems" />
-          {/* Site CSS — self-hosted */}
-          <link href="/static/css/styles.min.css" rel="stylesheet" />
+          {/* Site CSS */}
+          <link href={`/static/css/styles.min.${STATIC_V}.css`} rel="stylesheet" />
           {/* Language dropdown styles */}
           <style dangerouslySetInnerHTML={{ __html: `
             .lang-dropdown { position: relative; display: inline-block; }
@@ -70,13 +63,7 @@ class MyDocument extends Document<{ lang: string }> {
             .lang-dropdown__item:hover { background: #f5f5f5; }
             .lang-dropdown__item.is-active { font-weight: 600; }
           `}} />
-          {/* Map widget CSS + Leaflet (homepage only, small enough to load globally) */}
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossOrigin="anonymous" />
-          <link rel="stylesheet" href="/static/css/map-widget.css" />
-          {/* Google Fonts for map widget */}
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet" />
+          {/* Map widget CSS + Leaflet + Google Fonts moved to homepage component only */}
         </Head>
         <body>
           <Main />

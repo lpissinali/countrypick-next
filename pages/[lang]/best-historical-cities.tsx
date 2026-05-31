@@ -23,7 +23,7 @@ const HistoricalPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) =
     { label: t['historical.text11'] ?? 'Top Things To Do In Český Krumlov', country: t['czech_republic'] ?? 'Czech Republic', href: `/${lang}/czech-republic`, img: 'cesky-krumlov' },
     { label: t['historical.text12'] ?? 'Best Things To Do In Jerusalem',     country: t['israel']         ?? 'Israel',        href: `/${lang}/israel`,         img: 'jerusalem'     },
     { label: t['historical.text13'] ?? "Top Things To Do In Xi'an",         country: t['china']          ?? 'China',         href: `/${lang}/china`,          img: 'xian'          },
-    { label: t['historical.text14'] ?? 'Top Things To Do In Moscow',         country: t['russia']         ?? 'Russia',        href: `/${lang}/russia`,         img: 'moscow'        },
+    { label: t['historical.text14'] ?? 'Top Things To Do In Moscow',         country: t['russia']         ?? 'Russia',        href: `/${lang}/russian-federation`,         img: 'moscow'        },
     { label: t['historical.text15'] ?? 'Top Things To Do In Luxor',          country: t['egypt']          ?? 'Egypt',         href: `/${lang}/egypt`,          img: 'luxor'         },
     { label: t['historical.text16'] ?? 'Top Things To Do In Budapest',       country: t['hungary']        ?? 'Hungary',       href: `/${lang}/hungary`,        img: 'budapest'      },
   ];

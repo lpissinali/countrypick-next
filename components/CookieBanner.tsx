@@ -9,16 +9,13 @@ interface Props {
 }
 
 const STORAGE_KEY = 'cp_consent';
-
 type Consent = 'granted' | 'denied';
 
 function updateGtag(consent: Consent) {
   if (typeof window === 'undefined' || !(window as any).gtag) return;
   (window as any).gtag('consent', 'update', {
-    analytics_storage:     consent,
-    ad_storage:            consent,
-    ad_user_data:          consent,
-    ad_personalization:    consent,
+    analytics_storage: consent, ad_storage: consent,
+    ad_user_data: consent, ad_personalization: consent,
   });
 }
 
@@ -27,24 +24,11 @@ export default function CookieBanner({ lang, t }: Props) {
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Consent | null;
-    if (stored) {
-      updateGtag(stored);   // restore previous choice on every page load
-    } else {
-      setVisible(true);     // first visit — show banner
-    }
+    if (stored) { updateGtag(stored); } else { setVisible(true); }
   }, []);
 
-  function accept() {
-    localStorage.setItem(STORAGE_KEY, 'granted');
-    updateGtag('granted');
-    setVisible(false);
-  }
-
-  function decline() {
-    localStorage.setItem(STORAGE_KEY, 'denied');
-    updateGtag('denied');
-    setVisible(false);
-  }
+  function accept() { localStorage.setItem(STORAGE_KEY, 'granted'); updateGtag('granted'); setVisible(false); }
+  function decline() { localStorage.setItem(STORAGE_KEY, 'denied'); updateGtag('denied'); setVisible(false); }
 
   if (!visible) return null;
 
@@ -55,8 +39,8 @@ export default function CookieBanner({ lang, t }: Props) {
       <div className="cookie-banner__inner">
         <p className="cookie-banner__text">
           {tr('consent.text', 'We use cookies to analyse traffic and show relevant ads.')}{' '}
-          <Link href={`/${lang}/cookies`} className="cookie-banner__link">
-            {tr('consent.learn_more', 'Learn more')}
+          <Link href={`/${lang}/cookies`} className="cookie-banner__link" aria-label={tr('consent.learn_more_aria', 'Learn more about our cookie policy')}>
+            {tr('consent.learn_more', 'Learn more about our cookie policy')}
           </Link>
         </p>
         <div className="cookie-banner__actions">

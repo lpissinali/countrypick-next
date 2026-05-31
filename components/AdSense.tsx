@@ -1,9 +1,6 @@
 /**
- * AdSense.tsx
- *
- * Pushes the ad unit inside useEffect (after mount + layout), which avoids the
- * "No slot size for availableWidth=0" error that occurs when push() runs during
- * HTML parsing before the container has its final dimensions.
+ * AdSense.tsx — renders nothing on the server to prevent hydration mismatch
+ * when AdSense injects child iframes before React's hydrateRoot runs.
  */
 import { useEffect, useRef, useState } from 'react';
 
@@ -39,12 +36,10 @@ export default function AdSense({
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
-      // ignore — happens when AdSense script hasn't loaded yet
+      // ignore
     }
   }, [mounted]);
 
-  // Render nothing on the server — prevents hydration mismatch when
-  // AdSense injects child iframes before React's hydrateRoot runs.
   if (!mounted) return null;
 
   return (

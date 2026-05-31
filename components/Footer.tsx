@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Script from 'next/script';
 import type { Lang, FooterContinent } from '@/types';
+import { STATIC_V } from '@/lib/static-version';
 
 interface FooterProps {
   lang: Lang;
@@ -91,7 +92,7 @@ export default function Footer({ lang, t, continents, hideExplore }: FooterProps
       {/* Site JS — afterInteractive ensures it runs AFTER React hydration,
           preventing DOM mutations (sticky class, lang-selector, etc.)
           from racing with the hydration pass. */}
-      <Script src="/static/js/common_scripts_min.js" strategy="afterInteractive" />
+      <Script src={`/static/js/common_scripts_min.${STATIC_V}.js`} strategy="afterInteractive" />
       <script dangerouslySetInnerHTML={{ __html: `
         (function() {
           var dropdown = document.getElementById('langDropdown');

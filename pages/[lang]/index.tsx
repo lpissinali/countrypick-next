@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import Head from 'next/head';
+import { STATIC_V } from '@/lib/static-version';
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
@@ -125,13 +127,23 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
     if (mapInitRef.current) return;
     mapInitRef.current = true;
 
+    // Load Leaflet CSS dynamically — off the render-blocking critical path
+    const leafletHref = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    if (!document.querySelector(`link[href="${leafletHref}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = leafletHref;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    }
+
     // map-widget.js reads window.MW_I18N for i18n strings
     (window as any).MW_I18N = mwStrings;
 
     const loadScript = (src: string) => new Promise<void>((resolve, reject) => {
       // For map-widget.js: always remove the old tag and re-add it so the IIFE
       // re-executes against the freshly-rendered #mw-map container.
-      if (src === '/static/js/map-widget.js') {
+      if (src === `/static/js/map-widget.${STATIC_V}.js`) {
         document.querySelector(`script[src="${src}"]`)?.remove();
       } else if (document.querySelector(`script[src="${src}"]`)) {
         resolve(); return;
@@ -152,13 +164,20 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
       .then(() => html2canvasReady
         ? Promise.resolve()
         : loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'))
-      .then(() => loadScript('/static/js/map-widget.js'))
+      .then(() => loadScript(`/static/js/map-widget.${STATIC_V}.js`))
       .catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
+      {/* Map CSS — homepage only, avoids render-blocking on other pages */}
+      <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@400;500;600&display=swap" />
+        <link rel="stylesheet" href={`/static/css/map-widget.${STATIC_V}.css`} />
+      </Head>
       {/* ── Map Widget ── */}
       <div className="map-widget-wrap">
         <div className="mw-hero">

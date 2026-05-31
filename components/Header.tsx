@@ -13,12 +13,12 @@ interface HeaderProps {
 }
 
 function toggleMobileMenu(open?: boolean) {
-  const menu  = document.querySelector<HTMLElement>('.main-menu');
-  const layer = document.querySelector<HTMLElement>('.layer');
+  const menu   = document.querySelector<HTMLElement>('.main-menu');
+  const burger = document.querySelector<HTMLElement>('.cmn-toggle-switch');
   if (!menu) return;
   const isOpen = open ?? !menu.classList.contains('show');
   menu.classList.toggle('show', isOpen);
-  layer?.classList.toggle('layer-is-visible', isOpen);
+  burger?.classList.toggle('active', isOpen);
 }
 
 export default function Header({ lang, t, activeLangs }: HeaderProps) {
@@ -30,15 +30,6 @@ export default function Header({ lang, t, activeLangs }: HeaderProps) {
     router.events.on('routeChangeStart', handleRouteChange);
     return () => router.events.off('routeChangeStart', handleRouteChange);
   }, [router.events]);
-
-  // Close menu when tapping the overlay layer
-  useEffect(() => {
-    const layer = document.querySelector<HTMLElement>('.layer');
-    if (!layer) return;
-    const close = () => toggleMobileMenu(false);
-    layer.addEventListener('click', close);
-    return () => layer.removeEventListener('click', close);
-  }, []);
 
   useEffect(() => {
     const toggle = document.querySelector<HTMLButtonElement>('.lang-dropdown__toggle');
@@ -137,15 +128,6 @@ export default function Header({ lang, t, activeLangs }: HeaderProps) {
             </div>
 
             <div className="main-menu">
-              <div id="header_menu">
-                <Link href={`/${lang}`} title="Country Pick">
-                  Country <span>Pick</span>
-                </Link>
-              </div>
-              <a href="#" className="open_close" aria-label="Close menu" id="close_in"
-                onClick={e => { e.preventDefault(); toggleMobileMenu(false); }}>
-                <i className="icon_close" />
-              </a>
               <ul>
                 <li>
                   <Link href={`/${lang}/attractions`}>{t['top_attractions'] ?? 'Top Attractions'}</Link>

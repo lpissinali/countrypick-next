@@ -10,9 +10,15 @@
     "trailingSlash": false,
     "headers": [
       {
-        "source": "**/*.@(js|css)",
+        "source": "_next/static/**",
         "headers": [
           { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        ]
+      },
+      {
+        "source": "/static/**/*.@(js|css)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }
         ]
       },
       {
@@ -37,6 +43,16 @@
       }
     ],
     "redirects": [
+      {
+        "source": "/:lang/russia",
+        "destination": "/:lang/russian-federation",
+        "type": 301
+      },
+      {
+        "source": "/:lang/russia/:city",
+        "destination": "/:lang/russian-federation/:city",
+        "type": 301
+      },
       {
         "source": "/en/papua-new-guinea/port-moresby/1000",
         "destination": "/en/papua-new-guinea/port-moresby",
