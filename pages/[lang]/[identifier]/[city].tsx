@@ -119,7 +119,7 @@ async function fetchAgodaHotels(
       reviewScoreText: reviewLabel(h.reviewScore as number),
       dailyRate:       Math.round((h.dailyRate as number) * 100) / 100,
       imageURL: ((h.imageURL as string) ?? '')
-        .replace('http://pix6.agoda.net', 'https://ik.imagekit.io/bwvxkqzwak0rq')
+        .replace(/^http:\/\/pix\d+\.agoda\.net/, 'https://ik.imagekit.io/bwvxkqzwak0rq')
         .replace('http://q-xx.bstatic.com', 'https://q-xx.bstatic.com')
         .replace('?s=800x600', '/tr:w-252'),
       landingURL:  h.landingURL as string,

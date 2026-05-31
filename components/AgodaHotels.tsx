@@ -75,7 +75,7 @@ export default function AgodaHotels({ cityId, cityName, countryName, label }: Pr
           reviewScoreText: reviewLabel(h.reviewScore as number),
           dailyRate:       Math.round((h.dailyRate as number) * 100) / 100,
           imageURL: ((h.imageURL as string) ?? '')
-            .replace('http://pix6.agoda.net', 'https://ik.imagekit.io/bwvxkqzwak0rq')
+            .replace(/^http:\/\/pix\d+\.agoda\.net/, 'https://ik.imagekit.io/bwvxkqzwak0rq')
             .replace('?s=800x600', '/tr:w-252?v=2'),
           landingURL:  h.landingURL as string,
           cityName,

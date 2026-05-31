@@ -40,6 +40,7 @@ export default function AdSense({
 
   return (
     <ins
+      suppressHydrationWarning
       className={className}
       style={style}
       data-ad-client="ca-pub-4831931651277615"
