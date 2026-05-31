@@ -29,7 +29,6 @@ class MyDocument extends Document<{ lang: string }> {
             gtag('set', 'ads_data_redaction', true);
             gtag('set', 'url_passthrough', true);
           `}} />
-          {/* GA + AdSense loaded via Next.js Script in _app.tsx for better perf */}
           <meta name="google-adsense-account" content="ca-pub-4831931651277615" />
           {/* Resource hints */}
           <link rel="preconnect" href="https://ik.imagekit.io" crossOrigin="anonymous" />
