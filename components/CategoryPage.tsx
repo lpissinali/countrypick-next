@@ -28,6 +28,7 @@ interface Props {
 }
 
 const IK = 'https://ik.imagekit.io/bwvxkqzwak0rq';
+const V  = '?v=2';
 
 export default function CategoryPage({
   lang, t, continents, seo,
@@ -38,7 +39,7 @@ export default function CategoryPage({
   // heroImg can be a slug like 'nz.jpg' or a full URL
   const bgUrl = heroImg.startsWith('http')
     ? heroImg
-    : `${IK}/static/img/gallery/${heroImg}`;
+    : `${IK}/static/img/gallery/${heroImg}${V}`;
 
   const breadcrumb = breadcrumbKey
     ? (t[breadcrumbKey] ?? `${heroTitle[0]} ${heroTitle[1]}`)
@@ -87,12 +88,12 @@ export default function CategoryPage({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         loading="lazy"
-                        src={`${IK}/tr:w-400,h-270,f-auto/static/img/gems/${item.img}.jpg`}
+                        src={`${IK}/tr:w-400,h-270,f-auto/static/img/gems/${item.img}.jpg${V}`}
                         width={400} height={270}
                         className="img-responsive"
                         alt={item.label}
                         srcSet={[200,400,800].map(w =>
-                          `${IK}/tr:w-${w},h-${Math.round(w*270/400)},f-auto/static/img/gems/${item.img}.jpg ${w}w`
+                          `${IK}/tr:w-${w},h-${Math.round(w*270/400)},f-auto/static/img/gems/${item.img}.jpg${V} ${w}w`
                         ).join(', ')}
                         sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 991px) 220px, 360px"
                       />

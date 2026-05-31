@@ -22,7 +22,7 @@ export default function StaticPage({ lang, t, continents, seo, breadcrumb, child
       {/* Hero */}
       <section
         className="parallax_window_in"
-        style={{ backgroundImage: 'url(https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/it.jpg)' }}
+        style={{ backgroundImage: 'url(https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/it.jpg?v=2)' }}
       >
         <div id="sub_content_in">
           <div id="sub_content_in_left">

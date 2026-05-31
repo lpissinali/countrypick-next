@@ -5,6 +5,17 @@ import type { Lang, HreflangItem, PageSEO } from '@/types';
 
 export const BASE_URL = 'https://www.countrypick.com';
 
+/** ImageKit CDN base — bump ?v= to bust browser caches site-wide */
+export const IK_BASE = 'https://ik.imagekit.io/bwvxkqzwak0rq';
+export const IK_V    = 'v=2';
+/** Build a versioned ImageKit URL, optionally with a transform string e.g. "tr:w-300,h-200" */
+export function ikUrl(path: string, transform?: string): string {
+  const base = transform
+    ? `${IK_BASE}/${transform}${path}`
+    : `${IK_BASE}${path}`;
+  return `${base}?${IK_V}`;
+}
+
 /**
  * Build hreflang entries from the active languages fetched at build time.
  * Pass activeLangs from getStaticProps so disabled languages are excluded.

@@ -11,6 +11,7 @@ interface Props { lang: Lang; t: Record<string, string>; continents: FooterConti
 }
 
 const IK = 'https://ik.imagekit.io/bwvxkqzwak0rq';
+const V  = '?v=2';
 
 interface AttractionItem {
   /** i18n key for the overlay title, or null for hardcoded */
@@ -128,7 +129,7 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) 
   const title       = t['attractions.title']       ?? 'Top Attractions Around The World | Country Pick';
   const description = t['attractions.description'] ?? 'Discover amazing tours, top things to do and the best attractions around the world.';
 
-  const ogImage = 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/sub_header_florence_2.jpg';
+  const ogImage = 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/sub_header_florence_2.jpg?v=2';
   const seo = {
     title, description, canonical,
     ogImage, ogImageAlt: title,
@@ -145,7 +146,7 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) 
   return (
     <Layout activeLangs={activeLangs} lang={lang} t={t} seo={seo} continents={continents}>
       {/* Hero */}
-      <section className="parallax_window_in" style={{ backgroundImage: 'url(https://ik.imagekit.io/bwvxkqzwak0rq/static/img/sub_header_florence_2.jpg)' }}>
+      <section className="parallax_window_in" style={{ backgroundImage: 'url(https://ik.imagekit.io/bwvxkqzwak0rq/static/img/sub_header_florence_2.jpg?v=2)' }}>
         <div id="sub_content_in">
           <div className="country">{t['top_attractions'] ?? 'Top Attractions'}</div>
           <p />
@@ -194,7 +195,7 @@ const AttractionsPage: NextPage<Props> = ({ lang, t, continents, activeLangs }) 
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             loading={i < 2 ? 'eager' : 'lazy'}
-                            src={`${IK}/tr:w-400,h-270,f-auto/static/img/gems/${item.img}.jpg`}
+                            src={`${IK}/tr:w-400,h-270,f-auto/static/img/gems/${item.img}.jpg${V}`}
                             width={400} height={270}
                             className="img-responsive"
                             alt={itemTitle}

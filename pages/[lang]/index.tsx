@@ -64,7 +64,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
     title,
     description,
     canonical,
-    ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-1200,h-630,f-auto/static/img/it.jpg',
+    ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-1200,h-630,f-auto/static/img/it.jpg?v=2',
     ogImageAlt: title,
     hreflang: buildHreflang('', activeLangs),
     jsonLd,
@@ -230,7 +230,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
           <div className="footer">
             <div className="brand-block">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://ik.imagekit.io/bwvxkqzwak0rq/static/img/logo_2_2x.png" alt="Country Pick" crossOrigin="anonymous" />
+              <img src="https://ik.imagekit.io/bwvxkqzwak0rq/static/img/logo_2_2x.png?v=2" alt="Country Pick" crossOrigin="anonymous" />
               Country <span>Pick</span>
             </div>
             <div className="url">countrypick.com</div>
@@ -265,7 +265,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
                         <Link href={`/${lang}/${item.href}`}>
                           <figure>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${item.img}.jpg`} alt={item.alt} className="img-rounded" />
+                            <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${item.img}.jpg?v=2`} alt={item.alt} className="img-rounded" />
                           </figure>
                           <h3>{item.label}</h3>
                           <small>{item.sub}</small>
@@ -289,7 +289,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
                         <Link href={`/${lang}/${item.href}`}>
                           <figure>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${item.img}.jpg`} alt={item.alt} className="img-rounded" />
+                            <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${item.img}.jpg?v=2`} alt={item.alt} className="img-rounded" />
                           </figure>
                           <h3>{item.label}</h3>
                           <small>{item.sub}</small>
@@ -313,7 +313,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
                         <Link href={`/${lang}/${item.href}`}>
                           <figure>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${item.img}.jpg`} alt={item.alt} className="img-rounded" />
+                            <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/tr:w-60,h-60/${item.img}.jpg?v=2`} alt={item.alt} className="img-rounded" />
                           </figure>
                           <h3>{item.label}</h3>
                           <small>{item.sub}</small>
@@ -345,7 +345,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
                 <div className="img_container_grid">
                   <Link href={`/${lang}/${FEATURED_ROW1_BIG.href}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${FEATURED_ROW1_BIG.img}.jpg`} className="img-responsive" alt={FEATURED_ROW1_BIG.alt} loading="eager" />
+                    <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${FEATURED_ROW1_BIG.img}.jpg?v=2`} className="img-responsive" alt={FEATURED_ROW1_BIG.alt} loading="eager" />
                     <div className="short_info_grid">
                       <h3>{t['usa'] ?? FEATURED_ROW1_BIG.label}</h3>
                       <em>{FEATURED_ROW1_BIG.sub}</em>
@@ -362,7 +362,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
                   <div className="img_container_grid">
                     <Link href={`/${lang}/${f.href}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg`} className="img-responsive" alt={f.alt} loading="lazy" />
+                      <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg?v=2`} className="img-responsive" alt={f.alt} loading="lazy" />
                       <div className="short_info_grid">
                         <h3>{f.label}</h3>
                         <em>{f.sub}</em>
@@ -384,7 +384,7 @@ const HomePage: NextPage<Props> = ({ lang, t, continents, activeLangs, quizCount
                   <div className="img_container_grid">
                     <Link href={`/${lang}/${f.href}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg`} className="img-responsive" alt={f.alt} loading="lazy" />
+                      <img src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/${f.img}.jpg?v=2`} className="img-responsive" alt={f.alt} loading="lazy" />
                       <div className="short_info_grid">
                         <h3>{f.label}</h3>
                         <em>{f.sub}</em>

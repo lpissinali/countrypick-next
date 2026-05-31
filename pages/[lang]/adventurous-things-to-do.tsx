@@ -30,7 +30,7 @@ const AdventurePage: NextPage<Props> = ({ lang, t, continents, activeLangs }) =>
       activeLangs={activeLangs} lang={lang} t={t} continents={continents}
       seo={{
         title, description, canonical,
-        ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/nz.jpg',
+        ogImage: 'https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/nz.jpg?v=2',
         ogImageAlt: title,
         hreflang: buildHreflang('/adventurous-things-to-do', activeLangs),
         jsonLd: pageJsonLd({

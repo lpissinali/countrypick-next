@@ -169,8 +169,8 @@ const CityPage: NextPage<Props> = ({
 }) => {
   const hotels = hotelsProp ?? [];
   const alpha2Lower  = country.alpha2.toLowerCase();
-  const heroImage    = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
-  const gemImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`;
+  const heroImage    = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg?v=2`;
+  const gemImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg?v=2`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}/${gem.identifier}`;
 
   const description = `${t['city.description'] ?? 'Looking for the best things to do'}${cityPrep}${gem.name}? ${t['city.description2'] ?? 'Discover top attractions, activities and tours.'}`;
@@ -376,8 +376,8 @@ const CityPage: NextPage<Props> = ({
                                 className="nearby-card"
                               >
                                 <GemImage
-                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200/static/img/gems/${g.identifier}.jpg`}
-                                  fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200/static/img/gallery/${g.countryAlpha2.toLowerCase()}.jpg`}
+                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200/static/img/gems/${g.identifier}.jpg?v=2`}
+                                  fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-300,h-200/static/img/gallery/${g.countryAlpha2.toLowerCase()}.jpg?v=2`}
                                   alt={g.name}
                                   loading="lazy"
                                 />
@@ -419,7 +419,7 @@ const CityPage: NextPage<Props> = ({
                                 <div className="content-c">
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
                                   <img loading="lazy" className="logo-c"
-                                    src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg"
+                                    src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg?v=2"
                                     alt="Agoda hotels" />
                                   <div className="hotel-name">{h.hotelName}</div>
                                   <div className="rating-location-c">
@@ -478,8 +478,8 @@ const CityPage: NextPage<Props> = ({
                           <Link href={`/${lang}/${g.countryIdentifier}/${g.identifier}`}>
                             <figure>
                               <GemImage
-                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg`}
-                                fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gallery/${g.countryAlpha2.toLowerCase()}.jpg`}
+                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg?v=2`}
+                                fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gallery/${g.countryAlpha2.toLowerCase()}.jpg?v=2`}
                                 alt={g.name}
                                 className="img-rounded"
                               />

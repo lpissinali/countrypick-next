@@ -55,7 +55,7 @@ function monthLabels(lang: string): string[] {
 
 const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, faqs, season, activeLangs }) => {
   const alpha2Lower = country.alpha2.toLowerCase();
-  const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`;
+  const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg?v=2`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}`;
 
   // Build description from gem names (mirrors existing template logic)
@@ -191,8 +191,8 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                             <div className="img_container">
                               <Link href={`/${lang}/${country.identifier}/${gem.identifier}`}>
                                 <GemImage
-                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg`}
-                                  fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg`}
+                                  src={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg?v=2`}
+                                  fallback={`https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg?v=2`}
                                   className="img-responsive"
                                   alt={`${t['country.text5'] ?? 'Best Things To Do In'}${getCityPrep(gem.name, lang)}${gem.name}`}
                                 />
@@ -284,7 +284,7 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                             <figure>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg`}
+                                src={`https://ik.imagekit.io/bwvxkqzwak0rq/tr:w-60,h-60/static/img/gems/${g.identifier}.jpg?v=2`}
                                 alt={g.name}
                                 className="img-rounded"
                               />

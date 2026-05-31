@@ -76,7 +76,7 @@ export default function AgodaHotels({ cityId, cityName, countryName, label }: Pr
           dailyRate:       Math.round((h.dailyRate as number) * 100) / 100,
           imageURL: ((h.imageURL as string) ?? '')
             .replace('http://pix6.agoda.net', 'https://ik.imagekit.io/bwvxkqzwak0rq')
-            .replace('?s=800x600', '/tr:w-252'),
+            .replace('?s=800x600', '/tr:w-252?v=2'),
           landingURL:  h.landingURL as string,
           cityName,
           countryName,
@@ -105,7 +105,7 @@ export default function AgodaHotels({ cityId, cityName, countryName, label }: Pr
                 <img
                   loading="lazy"
                   className="logo-c"
-                  src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg"
+                  src="https://ik.imagekit.io/bwvxkqzwak0rq/images/mvc/default/agoda-logo.svg?v=2"
                   alt="Agoda hotels"
                 />
                 <div className="hotel-name">{h.hotelName}</div>
