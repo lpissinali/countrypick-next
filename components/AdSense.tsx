@@ -5,7 +5,7 @@
  * "No slot size for availableWidth=0" error that occurs when push() runs during
  * HTML parsing before the container has its final dimensions.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface AdSenseProps {
   slot: string;
@@ -26,21 +26,29 @@ export default function AdSense({
   className = 'adsbygoogle',
   style = { display: 'block' },
 }: AdSenseProps) {
+  const [mounted, setMounted] = useState(false);
   const pushed = useRef(false);
 
   useEffect(() => {
-    if (pushed.current) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || pushed.current) return;
     pushed.current = true;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // ignore — happens when AdSense script hasn't loaded yet
     }
-  }, []);
+  }, [mounted]);
+
+  // Render nothing on the server — prevents hydration mismatch when
+  // AdSense injects child iframes before React's hydrateRoot runs.
+  if (!mounted) return null;
 
   return (
     <ins
-      suppressHydrationWarning
       className={className}
       style={style}
       data-ad-client="ca-pub-4831931651277615"

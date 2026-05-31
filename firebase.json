@@ -36,6 +36,13 @@
         ]
       }
     ],
+    "redirects": [
+      {
+        "source": "/en/papua-new-guinea/port-moresby/1000",
+        "destination": "/en/papua-new-guinea/port-moresby",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "/",
