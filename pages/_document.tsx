@@ -22,8 +22,11 @@ class MyDocument extends Document<{ lang: string }> {
               ad_storage:         'denied',
               ad_user_data:       'denied',
               ad_personalization: 'denied',
-              wait_for_update:    500
+              wait_for_update:    500,
+              region:             []
             });
+            // Suppress Google's own Funding Choices dialog — we handle consent ourselves
+            gtag('set', 'no_new_user_default', true);
             gtag('set', 'ads_data_redaction', true);
             gtag('set', 'url_passthrough', true);
           `}} />

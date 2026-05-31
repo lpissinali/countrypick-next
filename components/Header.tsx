@@ -12,8 +12,33 @@ interface HeaderProps {
   activeLangs: { code: string; name: string }[];
 }
 
+function toggleMobileMenu(open?: boolean) {
+  const menu  = document.querySelector<HTMLElement>('.main-menu');
+  const layer = document.querySelector<HTMLElement>('.layer');
+  if (!menu) return;
+  const isOpen = open ?? !menu.classList.contains('show');
+  menu.classList.toggle('show', isOpen);
+  layer?.classList.toggle('layer-is-visible', isOpen);
+}
+
 export default function Header({ lang, t, activeLangs }: HeaderProps) {
   const router = useRouter();
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    const handleRouteChange = () => toggleMobileMenu(false);
+    router.events.on('routeChangeStart', handleRouteChange);
+    return () => router.events.off('routeChangeStart', handleRouteChange);
+  }, [router.events]);
+
+  // Close menu when tapping the overlay layer
+  useEffect(() => {
+    const layer = document.querySelector<HTMLElement>('.layer');
+    if (!layer) return;
+    const close = () => toggleMobileMenu(false);
+    layer.addEventListener('click', close);
+    return () => layer.removeEventListener('click', close);
+  }, []);
 
   useEffect(() => {
     const toggle = document.querySelector<HTMLButtonElement>('.lang-dropdown__toggle');
@@ -65,7 +90,7 @@ export default function Header({ lang, t, activeLangs }: HeaderProps) {
             <a
               className="cmn-toggle-switch cmn-toggle-switch__htx open_close"
               href="#"
-              onClick={e => e.preventDefault()}
+              onClick={e => { e.preventDefault(); toggleMobileMenu(); }}
               aria-label="Open menu"
             >
               <span>Menu mobile</span>
@@ -117,7 +142,8 @@ export default function Header({ lang, t, activeLangs }: HeaderProps) {
                   Country <span>Pick</span>
                 </Link>
               </div>
-              <a href="#" className="open_close" aria-label="Close menu" id="close_in">
+              <a href="#" className="open_close" aria-label="Close menu" id="close_in"
+                onClick={e => { e.preventDefault(); toggleMobileMenu(false); }}>
                 <i className="icon_close" />
               </a>
               <ul>
