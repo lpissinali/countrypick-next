@@ -4,7 +4,7 @@ import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import CookieBanner from '@/components/CookieBanner';
 
-const GA_ID = 'G-BD3ZB6065B';
+const GA_ID = 'G-5PE55NGFRF';
 
 export default function App({ Component, pageProps }: AppProps) {
   const lang = pageProps.lang ?? 'en';
