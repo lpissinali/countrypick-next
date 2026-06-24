@@ -33,6 +33,7 @@ import type { Lang, Country, Gem, Thing, FooterContinent } from '@/types';
 import { sanitizeHtml } from '@/lib/sanitize';
 import AdSense from '@/components/AdSense';
 import GemImage from '@/components/GemImage';
+import { achaForCity } from '@/lib/achabrasil';
 
 /** Deterministic seeded shuffle — same seed always yields the same order. */
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -168,6 +169,7 @@ const CityPage: NextPage<Props> = ({
   lang, country, gem, things, hotels: hotelsProp, sidebarGems, continents, t, cityPrep, countryPrep, faqs, nearbyGems, activeLangs,
 }) => {
   const hotels = hotelsProp ?? [];
+  const acha = achaForCity(lang, country.identifier, gem.identifier);
   const alpha2Lower  = country.alpha2.toLowerCase();
   const heroImage    = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg?v=2`;
   const gemImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg?v=2`;
@@ -274,6 +276,29 @@ const CityPage: NextPage<Props> = ({
                     {/* City description */}
                     {gem.description && (
                       <div dangerouslySetInnerHTML={{ __html: gem.description }} />
+                    )}
+
+                    {/* Voos para o destino — AchaBrasil (site irmão) */}
+                    {acha && (
+                      <div className="add_bottom_30" style={{ textAlign: 'center', padding: '22px', border: '1px solid #ededed', borderRadius: '10px', margin: '30px 0' }}>
+                        <p style={{ marginBottom: '12px', fontWeight: 600 }}>
+                          {acha.level === 'city'
+                            ? `Planejando a viagem? Encontre voos para ${gem.name}`
+                            : acha.level === 'country'
+                              ? `Planejando a viagem? Encontre voos para ${country.name}`
+                              : 'Planejando a viagem? Ache voos baratos pelo Brasil'}
+                        </p>
+                        <a href={acha.url} target="_blank" rel="noopener noreferrer" className="button">
+                          {acha.level === 'city'
+                            ? `Passagens aéreas para ${gem.name}`
+                            : acha.level === 'country'
+                              ? `Voos para ${country.name}`
+                              : 'Ver voos no AchaBrasil'}
+                        </a>
+                        <p style={{ marginTop: '10px', fontSize: '13px', color: '#999' }}>
+                          Compare GOL, LATAM e Azul no AchaBrasil
+                        </p>
+                      </div>
                     )}
 
                     {/* AdSense */}

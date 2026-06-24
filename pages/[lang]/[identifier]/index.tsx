@@ -15,6 +15,7 @@ import type { Lang, Country, GemWithThings, FooterContinent } from '@/types';
 import { sanitizeHtml } from '@/lib/sanitize';
 import AdSense from '@/components/AdSense';
 import GemImage from '@/components/GemImage';
+import { achaForCountry } from '@/lib/achabrasil';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   let s = 0;
@@ -54,6 +55,7 @@ function monthLabels(lang: string): string[] {
 }
 
 const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, continents, t, countryPrep, faqs, season, activeLangs }) => {
+  const acha = achaForCountry(lang, country.identifier);
   const alpha2Lower = country.alpha2.toLowerCase();
   const heroImage   = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg?v=2`;
   const canonicalUrl = `${BASE_URL}/${lang}/${country.identifier}`;
@@ -172,6 +174,25 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
                         className="country-description"
                         dangerouslySetInnerHTML={{ __html: country.description }}
                       />
+                    )}
+
+                    {/* Voos para o país — AchaBrasil (site irmão) */}
+                    {acha && (
+                      <div className="add_bottom_30" style={{ textAlign: 'center', padding: '22px', border: '1px solid #ededed', borderRadius: '10px', margin: '30px 0' }}>
+                        <p style={{ marginBottom: '12px', fontWeight: 600 }}>
+                          {acha.level === 'hub'
+                            ? 'Planejando a viagem? Ache voos baratos pelo Brasil'
+                            : `Planejando a viagem? Encontre voos para ${country.name}`}
+                        </p>
+                        <a href={acha.url} target="_blank" rel="noopener noreferrer" className="button">
+                          {acha.level === 'hub'
+                            ? 'Ver voos no AchaBrasil'
+                            : `Passagens aéreas para ${country.name}`}
+                        </a>
+                        <p style={{ marginTop: '10px', fontSize: '13px', color: '#999' }}>
+                          Compare GOL, LATAM e Azul no AchaBrasil
+                        </p>
+                      </div>
                     )}
                   </div>
 
