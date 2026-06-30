@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="180" viewBox="0 0 420 90" role="img" aria-label="BrasilTempo">
+  <g transform="translate(0,5)">
+    <g fill="#FFC83D">
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(0 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(45 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(90 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(135 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(180 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(225 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(270 40 39.6)"></rect>
+      <rect x="38" y="5.4" width="4.5" height="11.7" rx="2.25" transform="rotate(315 40 39.6)"></rect>
+    </g>
+    <circle cx="40" cy="39.6" r="17.1" fill="#FFC83D"></circle>
+    <path d="M8 64.8 q8.1 -7.2 16.2 0 t16.2 0 t16.2 0 t16.2 0" fill="none" stroke="#2E7BD6" stroke-width="5.4" stroke-linecap="round"></path>
+    <path d="M12.5 75.6 q8.1 -7.2 16.2 0 t16.2 0 t16.2 0" fill="none" stroke="#2E7BD6" stroke-width="5.4" stroke-linecap="round"></path>
+  </g>
+  <text x="92" y="58" font-family="&#39;Plus Jakarta Sans&#39;, &#39;Segoe UI&#39;, sans-serif" font-size="42" font-weight="800" letter-spacing="-1">
+    <tspan fill="#16202B">Brasil</tspan><tspan fill="#2E7BD6">Tempo</tspan>
+  </text>
+</svg>

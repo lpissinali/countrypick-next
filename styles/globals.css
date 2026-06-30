@@ -545,3 +545,39 @@
   .cookie-banner__actions { width: 100%; }
   .cookie-banner__btn { flex: 1; text-align: center; }
 }
+
+
+/* ── Sister-site CTA cards (AchaBrasil / BrasilTempo) ───────────────── */
+.cta-card{ display:block; position:relative; border-radius:14px; padding:20px 24px; margin:30px 0; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease; }
+.cta-card:hover{ transform:translateY(-2px); }
+.cta-card .cta-eyebrow{ display:block; font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:700; margin-bottom:5px; }
+.cta-card .cta-title{ display:block; font-size:19px; font-weight:800; line-height:1.25; }
+.cta-card .cta-sub{ display:block; font-size:13px; margin-top:4px; }
+.cta-card .cta-btn{ display:inline-block; margin-top:14px; font-weight:700; padding:11px 24px; border-radius:999px; transition:box-shadow .15s ease; }
+.cta-card:hover .cta-btn{ box-shadow:0 8px 20px rgba(0,0,0,.20); }
+
+/* Flights — boarding-pass / indigo, plane icon at left */
+.cta-flights{ display:flex; align-items:center; gap:18px; background:linear-gradient(135deg,#eef2ff,#e0e7ff); border:1px solid #c7d2fe; }
+.cta-flights .cta-icon{ font-size:38px; line-height:1; flex:0 0 auto; }
+.cta-flights .cta-body{ flex:1 1 auto; }
+.cta-flights .cta-eyebrow{ color:#4f46e5; }
+.cta-flights .cta-title{ color:#1e1b4b; }
+.cta-flights .cta-sub{ color:#4338ca; }
+.cta-flights .cta-btn{ background:#4f46e5; color:#fff; }
+
+/* Weather — sunny sky / BrasilTempo blue, centered */
+.cta-weather{ text-align:center; background:linear-gradient(135deg,#2E7BD6,#56b1ef); border:1px solid #2370c8; color:#fff; }
+.cta-weather .cta-icon{ display:block; font-size:40px; line-height:1; margin-bottom:2px; }
+.cta-weather .cta-eyebrow{ color:#dcefff; }
+.cta-weather .cta-title{ color:#fff; }
+.cta-weather .cta-sub{ color:#eaf6ff; }
+.cta-weather .cta-btn{ background:#fff; color:#1f6fc0; }
+
+@media (max-width:600px){
+  .cta-flights{ flex-direction:column; text-align:center; gap:10px; }
+}
+
+.cta-flights .cta-icon{ display:flex; align-items:center; line-height:0; }
+.cta-flights .cta-icon svg{ display:block; }
+.cta-weather .cta-brand{ display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; letter-spacing:.2px; color:#fff; margin-bottom:6px; }
+.cta-weather .cta-brand svg{ flex:0 0 auto; }

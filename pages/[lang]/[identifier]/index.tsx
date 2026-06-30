@@ -180,36 +180,33 @@ const CountryPage: NextPage<Props> = ({ lang, country, gems, sidebarGems, contin
 
                     {/* Voos para o país — AchaBrasil (site irmão) */}
                     {acha && (
-                      <div className="add_bottom_30" style={{ textAlign: 'center', padding: '22px', border: '1px solid #ededed', borderRadius: '10px', margin: '30px 0' }}>
-                        <p style={{ marginBottom: '12px', fontWeight: 600 }}>
-                          {acha.level === 'hub'
-                            ? 'Planejando a viagem? Ache voos baratos pelo Brasil'
-                            : `Planejando a viagem? Encontre voos para ${country.name}`}
-                        </p>
-                        <a href={acha.url} target="_blank" rel="noopener noreferrer" className="button">
-                          {acha.level === 'hub'
-                            ? 'Ver voos no AchaBrasil'
-                            : `Passagens aéreas para ${country.name}`}
-                        </a>
-                        <p style={{ marginTop: '10px', fontSize: '13px', color: '#999' }}>
-                          Compare GOL, LATAM e Azul no AchaBrasil
-                        </p>
-                      </div>
+                      <a href={acha.url} target="_blank" rel="noopener noreferrer" className="cta-card cta-flights">
+                        <span className="cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="#4f46e5"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></span>
+                        <span className="cta-body">
+                          <span className="cta-eyebrow">Passagens aéreas</span>
+                          <span className="cta-title">
+                            {acha.level === 'hub'
+                              ? 'Voos baratos pelo Brasil e pelo mundo'
+                              : `Voe para ${country.name} a partir do Brasil`}
+                          </span>
+                          <span className="cta-sub">Compare GOL, LATAM e Azul e ache a melhor tarifa</span>
+                          <span className="cta-btn">
+                            {acha.level === 'hub'
+                              ? 'Ver voos no AchaBrasil'
+                              : `Buscar voos para ${country.name}`}
+                          </span>
+                        </span>
+                      </a>
                     )}
 
                     {/* Previsão do tempo — BrasilTempo (site irmão) */}
                     {tempo && (
-                      <div className="add_bottom_30" style={{ textAlign: 'center', padding: '22px', border: '1px solid #ededed', borderRadius: '10px', margin: '30px 0' }}>
-                        <p style={{ marginBottom: '12px', fontWeight: 600 }}>
-                          {`Vai viajar para ${country.name}? Confira a previsão do tempo`}
-                        </p>
-                        <a href={tempo.url} target="_blank" rel="noopener noreferrer" className="button">
-                          Ver previsão do tempo no BrasilTempo
-                        </a>
-                        <p style={{ marginTop: '10px', fontSize: '13px', color: '#999' }}>
-                          Previsão para qualquer cidade do mundo
-                        </p>
-                      </div>
+                      <a href={tempo.url} target="_blank" rel="noopener noreferrer" className="cta-card cta-weather">
+                        <span className="cta-brand" aria-label="BrasilTempo"><svg viewBox="0 0 100 100" width="30" height="30" aria-hidden="true"><g fill="#FFC83D"><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(0 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(45 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(90 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(135 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(180 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(225 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(270 50 44)"/><rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(315 50 44)"/></g><circle cx="50" cy="44" r="19" fill="#FFC83D"/><path d="M10 72 q9 -8 18 0 t18 0 t18 0 t18 0" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round"/><path d="M15 84 q9 -8 18 0 t18 0 t18 0" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round"/></svg>BrasilTempo</span>
+                        <span className="cta-title">{`Que tempo faz${countryPrep}${country.name} agora?`}</span>
+                        <span className="cta-sub">Previsão de 7 dias para qualquer cidade do mundo</span>
+                        <span className="cta-btn">Ver no BrasilTempo</span>
+                      </a>
                     )}
                   </div>
 

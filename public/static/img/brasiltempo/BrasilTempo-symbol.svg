@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100" role="img" aria-label="BrasilTempo">
+  <g fill="#FFC83D">
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(0 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(45 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(90 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(135 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(180 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(225 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(270 50 44)"></rect>
+    <rect x="47.5" y="6" width="5" height="13" rx="2.5" transform="rotate(315 50 44)"></rect>
+  </g>
+  <circle cx="50" cy="44" r="19" fill="#FFC83D"></circle>
+  <path d="M10 72 q9 -8 18 0 t18 0 t18 0 t18 0" fill="none" stroke="#2E7BD6" stroke-width="6" stroke-linecap="round"></path>
+  <path d="M15 84 q9 -8 18 0 t18 0 t18 0" fill="none" stroke="#2E7BD6" stroke-width="6" stroke-linecap="round"></path>
+</svg>
