@@ -34,6 +34,7 @@ import { sanitizeHtml } from '@/lib/sanitize';
 import AdSense from '@/components/AdSense';
 import GemImage from '@/components/GemImage';
 import { achaForCity } from '@/lib/achabrasil';
+import { tempoForCity } from '@/lib/brasiltempo';
 
 /** Deterministic seeded shuffle — same seed always yields the same order. */
 function seededShuffle<T>(arr: T[], seed: string): T[] {
@@ -170,6 +171,7 @@ const CityPage: NextPage<Props> = ({
 }) => {
   const hotels = hotelsProp ?? [];
   const acha = achaForCity(lang, country.identifier, gem.identifier);
+  const tempo = tempoForCity(lang, gem.identifier, gem.name);
   const alpha2Lower  = country.alpha2.toLowerCase();
   const heroImage    = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gallery/${alpha2Lower}.jpg?v=2`;
   const gemImage     = `https://ik.imagekit.io/bwvxkqzwak0rq/static/img/gems/${gem.identifier}.jpg?v=2`;
@@ -297,6 +299,25 @@ const CityPage: NextPage<Props> = ({
                         </a>
                         <p style={{ marginTop: '10px', fontSize: '13px', color: '#999' }}>
                           Compare GOL, LATAM e Azul no AchaBrasil
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Previsão do tempo — BrasilTempo (site irmão) */}
+                    {tempo && (
+                      <div className="add_bottom_30" style={{ textAlign: 'center', padding: '22px', border: '1px solid #ededed', borderRadius: '10px', margin: '30px 0' }}>
+                        <p style={{ marginBottom: '12px', fontWeight: 600 }}>
+                          {tempo.level === 'city'
+                            ? `Vai para ${gem.name}? Veja como está o tempo`
+                            : 'Confira a previsão do tempo antes de viajar'}
+                        </p>
+                        <a href={tempo.url} target="_blank" rel="noopener noreferrer" className="button">
+                          {tempo.level === 'city'
+                            ? `Previsão do tempo em ${gem.name}`
+                            : 'Ver previsão do tempo no BrasilTempo'}
+                        </a>
+                        <p style={{ marginTop: '10px', fontSize: '13px', color: '#999' }}>
+                          Previsão de 7 dias no BrasilTempo
                         </p>
                       </div>
                     )}
